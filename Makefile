@@ -16,7 +16,7 @@ endif
 
 export CFLAGS LDFLAGS LIBCILAMP LIBJSMN LDLIBS CC
 
-all: test
+all: test bin
 
 $(LIBCILAMP):
 	make -C lib/
@@ -27,9 +27,13 @@ $(LIBJSMN):
 test: $(LIBCILAMP) $(LIBJSMN)
 	make -C test/
 
+bin: $(LIBCILAMP) $(LIBJSMN)
+	make -C bin/
+
 clean:
 	make -C third_party/jsmn/ clean
 	make -C lib/ clean
 	make -C test/ clean
+	make -C bin/ clean
 
 .PHONY: all test clean

@@ -9,7 +9,7 @@
 
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
-int response_parser_build_result(const char *in, int *state)
+int response_parser_build_result(const char *in, int *passed)
 {
     const char *expected = "HTTP/1.1 200 OK";
     char *token_p, *header_end;
@@ -40,9 +40,9 @@ int response_parser_build_result(const char *in, int *state)
     token_p += strlen(state_token);
 
     if (strncmp(token_p, "passed", 6) == 0)
-        *state = 1;
+        *passed = 1;
     else
-        *state = 0;
+        *passed = 0;
 
     return 0;
 }

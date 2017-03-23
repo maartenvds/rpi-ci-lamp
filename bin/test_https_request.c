@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
                             "Accept: application/vnd.travis-ci.2+json\r\n" \
                             "Host: api.travis-ci.org\r\n\r\n";
     char response[4000];
-    
+
     if (https_request_init(&https, "api.travis-ci.org") == -1) {
         debug("Init failed\n");
         https_request_deinit(&https);
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
             https_request_deinit(&https);
             return -1;
         }
-        printf("result = %d\n", passed);
+        printf("result = %s\n", response);
         sleep(2);
     }
 
