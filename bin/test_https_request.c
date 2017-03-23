@@ -1,12 +1,14 @@
 #include "https_request.h"
+#include "response_parser.h"
 #include <stdio.h>
 #include <unistd.h>
 
 int main(int argc, char *argv[])
 {
     int i;
+    int passed;
     struct HttpsRequest https;
-    const char *request = "GET /repos/travis-ci/travis-api/builds HTTP/1.1\r\n" \
+    const char *request = "GET /repos/travis-ci/travis-api/branches/meat-job-log-id HTTP/1.1\r\n" \
                             "User-Agent: MyClient/1.0.0\r\n" \
                             "Accept: application/vnd.travis-ci.2+json\r\n" \
                             "Host: api.travis-ci.org\r\n\r\n";
@@ -24,7 +26,13 @@ int main(int argc, char *argv[])
             https_request_deinit(&https);
             return -1;
         }
-        printf("Response: %s\n", response);
+
+        if (response_parser_build_result(response, &passed) == -1) {
+            debug("Failed parsing request\n");
+            https_request_deinit(&https);
+            return -1;
+        }
+        printf("result = %d\n", passed);
         sleep(2);
     }
 

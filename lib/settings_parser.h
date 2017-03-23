@@ -6,12 +6,20 @@
 #ifndef SETTINGS_PARSER_H
 #define SETTINGS_PARSER_H
 
-#define SETTINGS_PARSER_URI_SIZE   100
+#define SETTINGS_PARSER_STRING_SIZE     100
+#define SETTINGS_PARSER_REPO_SIZE       5
+
+struct SettingsRepo
+{
+    char name[SETTINGS_PARSER_STRING_SIZE];
+    char branch[SETTINGS_PARSER_STRING_SIZE];
+};
 
 struct Settings
 {
-    char uri[SETTINGS_PARSER_URI_SIZE];     /* uri of the server to fetch the build result */
-    int interval;                           /* poll interval in seconds */
+    int interval;                                               /* poll interval in seconds */
+    int repo_count;
+    struct SettingsRepo repos[SETTINGS_PARSER_STRING_SIZE];     /* repos to track */
 };
 
 /*

@@ -1,12 +1,15 @@
 LIBDIR = ../lib
-CFLAGS += -I$(LIBDIR)
+JSMNDIR = ../third_party/jsmn
+CFLAGS += -I$(LIBDIR) -I$(JSMNDIR)
+CFLAGS += $(shell pkg-config --cflags cmocka)
+LDLIBS += $(shell pkg-config --libs cmocka)
 
-all: test_https_request
+all: test_settings_parser
 
-test_https_request: test_https_request.o $(LIBDIR)/$(LIBCILAMP)
+test_settings_parser: test_settings_parser.o $(LIBDIR)/$(LIBCILAMP) $(JSMNDIR)/$(LIBJSMN)
 
 clean:
-	rm -rf test_https_request *.o
+	rm -rf test_settings_parser *.o
 
 .PHONY: clean all
 

@@ -31,7 +31,6 @@ int https_request_init(struct HttpsRequest *self, const char* uri);
  */
 int https_request_get(struct HttpsRequest *self, const char *request, char *response, size_t response_size);
 
-
 /*
  *  self:   https_request instance
  */
