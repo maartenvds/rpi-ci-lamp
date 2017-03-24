@@ -13,6 +13,7 @@ static struct Application app;
 
 void int_handler(int dummy)
 {
+    (void)dummy;
     application_deinit(&app);
     lamp_io_set_state(LAMP_OFF);
     exit(0);
@@ -20,6 +21,8 @@ void int_handler(int dummy)
 
 int main(int argc, char *argv[])
 {
+    (void)argc;
+    (void)argv;
     int sleep_time;
     enum LampIoState lamp_state;
 
