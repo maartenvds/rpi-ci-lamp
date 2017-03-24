@@ -44,15 +44,18 @@
 
 static void test_response_parser_passed(void **state)
 {
+    (void)state;
     int res;
     int passed;
-    char *in = *state;
+    char *in;
 
     /* setup */
-    sprintf(in, BIG_RESPONSE_STRING, "200", "\r\n", "state", "passed");
+    res = asprintf(&in, BIG_RESPONSE_STRING, "200", "\r\n", "state", "passed");
+    assert_true(res > 0);
 
     /* act */
     res = response_parser_build_result(in, &passed);
+    free(in);
 
     /* assert */
     assert_int_equal(res, 0);
@@ -61,15 +64,18 @@ static void test_response_parser_passed(void **state)
 
 static void test_response_parser_failed(void **state)
 {
+    (void)state;
     int res;
     int passed;
-    char *in = *state;
+    char *in;
 
     /* setup */
-    sprintf(in, BIG_RESPONSE_STRING, "200", "\r\n", "state", "failed");
+    res = asprintf(&in, BIG_RESPONSE_STRING, "200", "\r\n", "state", "failed");
+    assert_true(res > 0);
 
     /* act */
     res = response_parser_build_result(in, &passed);
+    free(in);
 
     /* assert */
     assert_int_equal(res, 0);
@@ -78,15 +84,18 @@ static void test_response_parser_failed(void **state)
 
 static void test_response_parser_bad_reponse_code(void **state)
 {
+    (void)state;
     int res;
     int passed;
-    char *in = *state;
+    char *in;
 
     /* setup */
-    sprintf(in, BIG_RESPONSE_STRING, "404", "\r\n", "state", "failed");
+    res = asprintf(&in, BIG_RESPONSE_STRING, "404", "\r\n", "state", "failed");
+    assert_true(res > 0);
 
     /* act */
     res = response_parser_build_result(in, &passed);
+    free(in);
 
     /* assert */
     assert_int_equal(res, -1);
@@ -94,15 +103,18 @@ static void test_response_parser_bad_reponse_code(void **state)
 
 static void test_response_parser_end_of_http_header_not_found(void **state)
 {
+    (void)state;
     int res;
     int passed;
-    char *in = *state;
+    char *in;
 
     /* setup */
-    sprintf(in, BIG_RESPONSE_STRING, "200", "", "state", "failed");
+    res = asprintf(&in, BIG_RESPONSE_STRING, "200", "", "state", "failed");
+    assert_true(res > 0);
 
     /* act */
     res = response_parser_build_result(in, &passed);
+    free(in);
 
     /* assert */
     assert_int_equal(res, -1);
@@ -110,42 +122,31 @@ static void test_response_parser_end_of_http_header_not_found(void **state)
 
 static void test_response_parser_state_token_not_found(void **state)
 {
+    (void)state;
     int res;
     int passed;
-    char *in = *state;
+    char *in;
 
     /* setup */
-    sprintf(in, BIG_RESPONSE_STRING, "200", "\r\n", "unknown", "failed");
+    res = asprintf(&in, BIG_RESPONSE_STRING, "200", "\r\n", "unknown", "failed");
+    assert_true(res > 0);
 
     /* act */
     res = response_parser_build_result(in, &passed);
+    free(in);
 
     /* assert */
     assert_int_equal(res, -1);
 }
 
-static int setup(void **state)
-{
-    char *str = malloc(strlen(BIG_RESPONSE_STRING) + 100);
-    assert_non_null(str);
-    *state = str;
-    return 0;
-}
-
-static int teardown(void **state)
-{
-    free(*state);
-    return 0;
-}
-
 int main(void)
 {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test_setup_teardown(test_response_parser_passed, setup, teardown),
-        cmocka_unit_test_setup_teardown(test_response_parser_failed, setup, teardown),
-        cmocka_unit_test_setup_teardown(test_response_parser_bad_reponse_code, setup, teardown),
-        cmocka_unit_test_setup_teardown(test_response_parser_end_of_http_header_not_found, setup, teardown),
-        cmocka_unit_test_setup_teardown(test_response_parser_state_token_not_found, setup, teardown),
+        cmocka_unit_test(test_response_parser_passed),
+        cmocka_unit_test(test_response_parser_failed),
+        cmocka_unit_test(test_response_parser_bad_reponse_code),
+        cmocka_unit_test(test_response_parser_end_of_http_header_not_found),
+        cmocka_unit_test(test_response_parser_state_token_not_found),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);
