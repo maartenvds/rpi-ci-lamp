@@ -4,7 +4,7 @@
  */
 
 #include "https_request.h"
-#include "debug.h"
+#include "logging.h"
 
 #include <string.h>
 #include <netdb.h>
@@ -22,13 +22,13 @@ int https_request_init(struct HttpsRequest *self, const char* uri)
     self->ssl_ctx = SSL_CTX_new (SSLv23_client_method());
 
     if (!self->ssl_ctx) {
-        debug("Failed to create new SSL context\n");
+        error("Failed to create new SSL context\n");
         return -1;
     }
 
     /* resolve uri */
     if ((host = gethostbyname(uri)) == NULL) {
-        debug("Failed to resolve hostname '%s'\n", uri);
+        error("Failed to resolve hostname '%s'\n", uri);
         return -1;
     }
 
@@ -48,12 +48,12 @@ int https_request_get(struct HttpsRequest *self, const char *request, char *resp
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == -1) {
-        debug("Failed to create a socket: %s\n", strerror(errno));
+        error("Failed to create a socket: %s\n", strerror(errno));
         return -1;
     }
 
     if (connect(sock , (struct sockaddr *)&self->server, sizeof(self->server)) < 0) {
-        debug("Failed to open connection: %s\n", strerror(errno));
+        error("Failed to open connection: %s\n", strerror(errno));
         res = -1;
         goto close_socket;
     }
@@ -61,32 +61,32 @@ int https_request_get(struct HttpsRequest *self, const char *request, char *resp
     SSL *conn = SSL_new(self->ssl_ctx);
 
     if (!conn) {
-        debug("Failed to create new SSL socket\n");
+        error("Failed to create new SSL socket\n");
         res = -1;
         goto shutdown_ssl_connection;
     }
 
     if (!SSL_set_fd(conn, sock)) {
-        debug("Failed to set SSL socket\n");
+        error("Failed to set SSL socket\n");
         res = -1;
         goto shutdown_ssl_connection;
     }
 
     if (!SSL_connect(conn)) {
-        debug("Failed to open SSL connection\n");
+        error("Failed to open SSL connection\n");
         res = -1;
         goto shutdown_ssl_connection;
     }
 
     if (SSL_write(conn, request, strlen(request)) <= 0) {
-        debug("Failed to send request\n");
+        error("Failed to send request\n");
         res = -1;
         goto shutdown_ssl_connection;
     }
 
     len = SSL_read(conn, response, response_size);
     if (len <= 0) {
-        debug("Failed to receive response\n");
+        error("Failed to receive response\n");
         res = -1;
         goto shutdown_ssl_connection;
 

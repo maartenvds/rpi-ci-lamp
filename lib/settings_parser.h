@@ -19,7 +19,7 @@ struct Settings
 {
     int interval;                                               /* poll interval in seconds */
     int repo_count;
-    struct SettingsRepo repos[SETTINGS_PARSER_STRING_SIZE];     /* repos to track */
+    struct SettingsRepo repos[SETTINGS_PARSER_REPO_SIZE];       /* repos to track */
 };
 
 /*

@@ -1,6 +1,6 @@
 #include "https_request.h"
 #include "response_parser.h"
-#include <stdio.h>
+#include "logging.h"
 #include <unistd.h>
 
 int main(int argc, char *argv[])
@@ -22,13 +22,13 @@ int main(int argc, char *argv[])
 
     for (i=0;i<3;i++) {
         if (https_request_get(&https, request, response, 4000) == -1) {
-            debug("Request failed\n");
+            error("Request failed\n");
             https_request_deinit(&https);
             return -1;
         }
 
         if (response_parser_build_result(response, &passed) == -1) {
-            debug("Failed parsing request\n");
+            error("Failed parsing request\n");
             https_request_deinit(&https);
             return -1;
         }

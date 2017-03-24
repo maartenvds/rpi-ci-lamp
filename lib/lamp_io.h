@@ -8,8 +8,10 @@
 
 enum LampIoState
 {
-    LAMP_GREEN = 0,
-    LAMP_RED
+    LAMP_OFF = 0,
+    LAMP_GREEN,
+    LAMP_RED,
+    LAMP_ERROR
 };
 
 void lamp_io_set_state(enum LampIoState state);

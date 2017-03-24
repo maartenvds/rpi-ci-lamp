@@ -8,6 +8,8 @@
 
 #include <stdio.h>
 
+#define error(fmt, ...)     fprintf(stderr, fmt, ##__VA_ARGS__)
+
 #ifdef DEBUG
 #define debug printf
 #else

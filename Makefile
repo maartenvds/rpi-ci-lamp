@@ -1,7 +1,7 @@
 CC=gcc
 LDLIBS+=-lssl -lcrypto
 CFLAGS+=-I/usr/include/openssl
-CFLAGS+=-Wall
+CFLAGS+=-Wall -D_GNU_SOURCE
 LDFLAGS+=
 LIBCILAMP=libcilamp.a
 LIBJSMN=libjsmn.a

@@ -6,7 +6,6 @@
 #ifndef HTTPS_REQUEST_H
 #define HTTPS_REQUEST_H
 
-#include "debug.h"
 #include <openssl/ssl.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
