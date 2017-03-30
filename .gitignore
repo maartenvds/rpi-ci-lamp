@@ -1,3 +1,8 @@
+# Binaries
+bin/main
+test/test_response_parser
+test/test_settings_parser
+
 # Object files
 *.o
 *.ko

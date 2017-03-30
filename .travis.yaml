@@ -1,0 +1,13 @@
+install:
+    - wget https://cmocka.org/files/1.1/cmocka-1.1.0.tar.xz
+    - cd cmocka-1.1.0
+    - mkdir build
+    - cd build
+    - cmake ..
+    - sudo make install
+    - export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+
+script:
+    - make DEBUG=1
+    - ./test/test_response_parser
+    - ./test/test_settings_parser
