@@ -1,4 +1,5 @@
 install:
+    - cd /tmp
     - wget https://cmocka.org/files/1.1/cmocka-1.1.0.tar.xz
     - tar -xvf cmocka-1.1.0.tar.xz
     - cd cmocka-1.1.0
@@ -7,6 +8,7 @@ install:
     - cmake ..
     - sudo make install
     - export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+    - cd $TRAVIS_BUILD_DIR
 
 script:
     - make DEBUG=1
