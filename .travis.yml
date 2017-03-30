@@ -1,3 +1,7 @@
+before_install:
+    # update package list
+    - sudo apt-get -qq update
+
 install:
     # install address sanitizer
     - sudo apt-get install -y libasan2
