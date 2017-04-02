@@ -82,7 +82,7 @@ static void test_response_parser_failed(void **state)
     assert_int_equal(build_state, BUILD_STATE_FAILED);
 }
 
-static void test_response_parser_running(void **state)
+static void test_response_parser_running1(void **state)
 {
     (void)state;
     int res;
@@ -91,6 +91,26 @@ static void test_response_parser_running(void **state)
 
     /* setup */
     res = asprintf(&in, BIG_RESPONSE_STRING, "200", "\r\n", "state", "created");
+    assert_true(res > 0);
+
+    /* act */
+    res = response_parser_build_result(in, &build_state);
+    free(in);
+
+    /* assert */
+    assert_int_equal(res, 0);
+    assert_int_equal(build_state, BUILD_STATE_RUNNING);
+}
+
+static void test_response_parser_running2(void **state)
+{
+    (void)state;
+    int res;
+    enum BuildState build_state;
+    char *in;
+
+    /* setup */
+    res = asprintf(&in, BIG_RESPONSE_STRING, "200", "\r\n", "state", "started");
     assert_true(res > 0);
 
     /* act */
@@ -164,7 +184,8 @@ int main(void)
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_response_parser_passed),
         cmocka_unit_test(test_response_parser_failed),
-        cmocka_unit_test(test_response_parser_running),
+        cmocka_unit_test(test_response_parser_running1),
+        cmocka_unit_test(test_response_parser_running2),
         cmocka_unit_test(test_response_parser_bad_reponse_code),
         cmocka_unit_test(test_response_parser_end_of_http_header_not_found),
         cmocka_unit_test(test_response_parser_state_token_not_found),
