@@ -1,6 +1,6 @@
 /*
  *  Main application code
- *  Author: Maarten Vandersteege
+ *  Author: Maarten Vandersteegen
  */
 #include "application.h"
 #include "response_parser.h"
@@ -21,7 +21,7 @@ int application_init(struct Application *self, const char *settings_filename, co
     self->settings_filename = settings_filename;
     self->settings.interval = 1;
     self->settings.repo_count = 0;
-    self->lamp_state = LAMP_OFF;
+    lamp_io_off(&self->lamp_state);
 
     if (https_request_init(&self->https, uri) == -1) {
         https_request_deinit(&self->https);
@@ -36,10 +36,20 @@ void application_deinit(struct Application *self)
     https_request_deinit(&self->https);
 }
 
-static int application_routine(struct Application *self)
+static void accumulate_build_state(enum BuildState *aggregate_build_state, enum BuildState build_state)
+{
+    const int map[3][3] = {
+        {   BUILD_STATE_FAILED,     BUILD_STATE_RUNNING,    BUILD_STATE_FAILED  },
+        {   BUILD_STATE_RUNNING,    BUILD_STATE_RUNNING,    BUILD_STATE_RUNNING },
+        {   BUILD_STATE_FAILED,     BUILD_STATE_RUNNING,    BUILD_STATE_PASSED  }};
+
+    *aggregate_build_state = map[*aggregate_build_state][build_state];
+}
+
+static int application_routine(struct Application *self, enum BuildState *aggregate_build_state)
 {
     int i, res;
-    int passed;
+    enum BuildState build_state;
     const char *request_fmt = REQUEST_TEMPLATE;
     char *request, *settings_str;
     char response[MAX_REPONSE_SIZE];
@@ -58,6 +68,8 @@ static int application_routine(struct Application *self)
         error("Failed to parse settings file %s\n", self->settings_filename);
         return -1;
     }
+
+    *aggregate_build_state = BUILD_STATE_PASSED; /* initial state */
 
     /* loop over all repository entries */
     for (i=0; i<self->settings.repo_count; i++) {
@@ -80,30 +92,26 @@ static int application_routine(struct Application *self)
         }
 
         /* parse HTTP response */
-        if (response_parser_build_result(response, &passed) == -1) {
+        if (response_parser_build_result(response, &build_state) == -1) {
             error("Failed parsing response from '%s','%s'\n", name, branch);
             return -1;
         }
 
-        /* calculate lamp state */
-        if (!passed) {
-            self->lamp_state = LAMP_RED;
-            break;                      /* some build failed, no use to check other builds */
-        }
+        accumulate_build_state(aggregate_build_state, build_state);
     }
+
 
     return 0;
 }
 
-int application_run(struct Application *self, enum LampIoState *lamp_state)
+int application_run(struct Application *self)
 {
-    self->lamp_state = LAMP_GREEN;
+    enum BuildState aggregate_build_state;
 
-    if (application_routine(self) == -1) {
-        self->lamp_state = LAMP_ERROR;
-    }
-
-    *lamp_state = self->lamp_state;
+    if (application_routine(self, &aggregate_build_state) == 0)
+        lamp_io_set_state(&self->lamp_state, aggregate_build_state);
+    else
+        lamp_io_error(&self->lamp_state);
 
     return self->settings.interval;
 }

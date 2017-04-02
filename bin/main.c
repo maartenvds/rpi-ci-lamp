@@ -15,7 +15,7 @@ void int_handler(int dummy)
 {
     (void)dummy;
     application_deinit(&app);
-    lamp_io_set_state(LAMP_OFF);
+    lamp_io_off(&app.lamp_state);
     exit(0);
 }
 
@@ -24,7 +24,6 @@ int main(int argc, char *argv[])
     (void)argc;
     (void)argv;
     int sleep_time;
-    enum LampIoState lamp_state;
 
     signal(SIGINT, int_handler);
 
@@ -34,8 +33,7 @@ int main(int argc, char *argv[])
     }
 
     while (1) {
-        sleep_time = application_run(&app, &lamp_state);
-        lamp_io_set_state(lamp_state);
+        sleep_time = application_run(&app);
         sleep(sleep_time);
     }
 

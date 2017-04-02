@@ -9,7 +9,7 @@
 
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
-int response_parser_build_result(const char *in, int *passed)
+int response_parser_build_result(const char *in, enum BuildState *state)
 {
     const char *expected = "HTTP/1.1 200 OK";
     char *token_p, *header_end;
@@ -36,13 +36,15 @@ int response_parser_build_result(const char *in, int *passed)
         error("No 'state' token found in HTTP body\n");
         return -1;
     }
-    
+
     token_p += strlen(state_token);
 
-    if (strncmp(token_p, "passed", 6) == 0)
-        *passed = 1;
+    if (strncmp(token_p, "created", 7) == 0)
+        *state = BUILD_STATE_RUNNING;
+    else if (strncmp(token_p, "passed", 6) == 0)
+        *state = BUILD_STATE_PASSED;
     else
-        *passed = 0;
+        *state = BUILD_STATE_FAILED;
 
     return 0;
 }

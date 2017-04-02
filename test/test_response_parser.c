@@ -46,7 +46,7 @@ static void test_response_parser_passed(void **state)
 {
     (void)state;
     int res;
-    int passed;
+    enum BuildState build_state;
     char *in;
 
     /* setup */
@@ -54,19 +54,19 @@ static void test_response_parser_passed(void **state)
     assert_true(res > 0);
 
     /* act */
-    res = response_parser_build_result(in, &passed);
+    res = response_parser_build_result(in, &build_state);
     free(in);
 
     /* assert */
     assert_int_equal(res, 0);
-    assert_true(passed);
+    assert_int_equal(build_state, BUILD_STATE_PASSED);
 }
 
 static void test_response_parser_failed(void **state)
 {
     (void)state;
     int res;
-    int passed;
+    enum BuildState build_state;
     char *in;
 
     /* setup */
@@ -74,19 +74,39 @@ static void test_response_parser_failed(void **state)
     assert_true(res > 0);
 
     /* act */
-    res = response_parser_build_result(in, &passed);
+    res = response_parser_build_result(in, &build_state);
     free(in);
 
     /* assert */
     assert_int_equal(res, 0);
-    assert_false(passed);
+    assert_int_equal(build_state, BUILD_STATE_FAILED);
+}
+
+static void test_response_parser_running(void **state)
+{
+    (void)state;
+    int res;
+    enum BuildState build_state;
+    char *in;
+
+    /* setup */
+    res = asprintf(&in, BIG_RESPONSE_STRING, "200", "\r\n", "state", "created");
+    assert_true(res > 0);
+
+    /* act */
+    res = response_parser_build_result(in, &build_state);
+    free(in);
+
+    /* assert */
+    assert_int_equal(res, 0);
+    assert_int_equal(build_state, BUILD_STATE_RUNNING);
 }
 
 static void test_response_parser_bad_reponse_code(void **state)
 {
     (void)state;
     int res;
-    int passed;
+    enum BuildState build_state;
     char *in;
 
     /* setup */
@@ -94,7 +114,7 @@ static void test_response_parser_bad_reponse_code(void **state)
     assert_true(res > 0);
 
     /* act */
-    res = response_parser_build_result(in, &passed);
+    res = response_parser_build_result(in, &build_state);
     free(in);
 
     /* assert */
@@ -105,7 +125,7 @@ static void test_response_parser_end_of_http_header_not_found(void **state)
 {
     (void)state;
     int res;
-    int passed;
+    enum BuildState build_state;
     char *in;
 
     /* setup */
@@ -113,7 +133,7 @@ static void test_response_parser_end_of_http_header_not_found(void **state)
     assert_true(res > 0);
 
     /* act */
-    res = response_parser_build_result(in, &passed);
+    res = response_parser_build_result(in, &build_state);
     free(in);
 
     /* assert */
@@ -124,7 +144,7 @@ static void test_response_parser_state_token_not_found(void **state)
 {
     (void)state;
     int res;
-    int passed;
+    enum BuildState build_state;
     char *in;
 
     /* setup */
@@ -132,7 +152,7 @@ static void test_response_parser_state_token_not_found(void **state)
     assert_true(res > 0);
 
     /* act */
-    res = response_parser_build_result(in, &passed);
+    res = response_parser_build_result(in, &build_state);
     free(in);
 
     /* assert */
@@ -144,6 +164,7 @@ int main(void)
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_response_parser_passed),
         cmocka_unit_test(test_response_parser_failed),
+        cmocka_unit_test(test_response_parser_running),
         cmocka_unit_test(test_response_parser_bad_reponse_code),
         cmocka_unit_test(test_response_parser_end_of_http_header_not_found),
         cmocka_unit_test(test_response_parser_state_token_not_found),

@@ -2,13 +2,7 @@ dist: trusty
 sudo: required
 language: c
 
-before_install:
-    # update package list
-    - sudo apt-get -qq update
-
 install:
-    # install address sanitizer
-    - sudo apt-get install -y libasan0
     # compile and install cmocka test framework
     - cd /tmp
     - wget https://cmocka.org/files/1.1/cmocka-1.1.0.tar.xz

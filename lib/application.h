@@ -6,6 +6,7 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include "build_state.h"
 #include "lamp_io.h"
 #include "https_request.h"
 #include "settings_parser.h"
@@ -15,7 +16,7 @@ struct Application
     struct HttpsRequest https;
     struct Settings settings;
     const char *settings_filename;
-    enum LampIoState lamp_state;
+    int lamp_state;
 };
 
 /*
@@ -33,9 +34,8 @@ void application_deinit(struct Application *self);
 
 /*
  *  self:       application instance
- *  lamp_state: new state that the lamp should get
  *  return:     sleep time in seconds
  */
-int application_run(struct Application *self, enum LampIoState *lamp_state);
+int application_run(struct Application *self);
 
 #endif /* APPLICATION_H */
