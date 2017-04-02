@@ -39,6 +39,8 @@ int response_parser_build_result(const char *in, enum BuildState *state)
 
     token_p += strlen(state_token);
 
+    printf("%s\n", token_p);
+
     if (strncmp(token_p, "created", 7) == 0)
         *state = BUILD_STATE_RUNNING;
     else if (strncmp(token_p, "passed", 6) == 0)
