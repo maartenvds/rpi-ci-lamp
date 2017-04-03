@@ -21,7 +21,7 @@ int application_init(struct Application *self, const char *settings_filename, co
     self->settings_filename = settings_filename;
     self->settings.interval = 1;
     self->settings.repo_count = 0;
-    lamp_io_off(&self->lamp_state);
+    lamp_control_init(&self->lamp_state);
 
     if (https_request_init(&self->https, uri) == -1) {
         https_request_deinit(&self->https);
@@ -109,9 +109,9 @@ int application_run(struct Application *self)
     enum BuildState aggregate_build_state;
 
     if (application_routine(self, &aggregate_build_state) == 0)
-        lamp_io_set_state(&self->lamp_state, aggregate_build_state);
+        lamp_control_set_state(&self->lamp_state, aggregate_build_state);
     else
-        lamp_io_error(&self->lamp_state);
+        lamp_control_signal_error(&self->lamp_state);
 
     return self->settings.interval;
 }

@@ -7,7 +7,7 @@
 #define APPLICATION_H
 
 #include "build_state.h"
-#include "lamp_io.h"
+#include "lamp_control.h"
 #include "https_request.h"
 #include "settings_parser.h"
 

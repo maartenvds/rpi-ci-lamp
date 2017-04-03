@@ -15,7 +15,7 @@ void int_handler(int dummy)
 {
     (void)dummy;
     application_deinit(&app);
-    lamp_io_off(&app.lamp_state);
+    lamp_control_off(&app.lamp_state);
     exit(0);
 }
 

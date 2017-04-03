@@ -20,5 +20,4 @@ before_script:
 
 script:
     - make DEBUG=1
-    - ./test/test_response_parser
-    - ./test/test_settings_parser
+    - ./test/run_unit_tests.sh
