@@ -27,7 +27,9 @@ char *read_file(const char *name)
     if (!string)
         return NULL;
 
-    fread(string, (size_t)fsize, 1, f);
+    if (fread(string, (size_t)fsize, 1, f) == 0)
+        return NULL;
+
     fclose(f);
 
     string[fsize] = 0;

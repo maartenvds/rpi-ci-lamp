@@ -5,7 +5,7 @@ CFLAGS += -I$(LIBDIR) -I$(JSMNDIR)
 main: main.o $(LIBDIR)/$(LIBCILAMP) $(JSMNDIR)/$(LIBJSMN)
 
 clean:
-	rm -rf main *.o
+	rm -rf main *.o *.gcno *.gcda
 
 .PHONY: clean
 

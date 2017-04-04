@@ -8,8 +8,12 @@
 #include "settings_parser.h"
 
 #define ENTRY_TEMPLATE          "{\"name\":\"%s\", \"branch\":\"%s\"}"
+#define FIXED_TEMPLATE          "{\"name\":\"aname\", \"branch\":\"abranch\"}"
 #define JSON_TEMPLATE           "{\"interval\":%s,\"repos\":[" ENTRY_TEMPLATE "]}"
 #define JSON_MULTI_TEMPLATE     "{\"interval\":10,\"repos\":[" ENTRY_TEMPLATE ENTRY_TEMPLATE "]}"
+#define JSON_TOO_LONG_TEMPLATE  "{\"interval\":10,\"repos\":[" FIXED_TEMPLATE \
+                                        FIXED_TEMPLATE FIXED_TEMPLATE FIXED_TEMPLATE \
+                                        FIXED_TEMPLATE FIXED_TEMPLATE FIXED_TEMPLATE "]}"
 
 static void test_settings_parser_one_build(void **state)
 {
@@ -170,6 +174,25 @@ static void test_settings_too_long_name(void **state)
     assert_int_equal(res, -1);
 }
 
+static void test_settings_too_many_repos(void **state)
+{
+    (void) state;
+    int res;
+    char *in;
+    struct Settings set;
+
+    /* setup */
+    res = asprintf(&in, JSON_TOO_LONG_TEMPLATE);
+    assert_true(res > 0);
+
+    /* act */
+    res = settings_parser_get_settings(in, &set);
+    free(in);
+
+    /* assert */
+    assert_int_equal(res, -1);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -180,7 +203,8 @@ int main(void)
         cmocka_unit_test(test_settings_non_numeric_interval),
         cmocka_unit_test(test_settings_parser_order_indenendence),
         cmocka_unit_test(test_settings_syntax_error),
-        cmocka_unit_test(test_settings_too_long_name)
+        cmocka_unit_test(test_settings_too_long_name),
+        cmocka_unit_test(test_settings_too_many_repos)
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

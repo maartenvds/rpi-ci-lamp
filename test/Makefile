@@ -11,7 +11,7 @@ test_response_parser: test_response_parser.o $(LIBDIR)/$(LIBCILAMP) $(JSMNDIR)/$
 test_lamp_control_red_green: test_lamp_control_red_green.o $(LIBDIR)/$(LIBCILAMP)
 
 clean:
-	rm -rf test_settings_parser test_response_parser test_lamp_control_red_green *.o
+	rm -rf test_settings_parser test_response_parser test_lamp_control_red_green *.o *.gcda *.gcno
 
 .PHONY: clean all
 

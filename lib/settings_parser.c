@@ -68,21 +68,26 @@ int settings_parser_get_settings(const char *in, struct Settings *out)
                 return -1;
             }
 
-        } else if (out->repo_count == SETTINGS_PARSER_REPO_SIZE) {
-            continue;
-
         } else if (strcmp(token_str, "name") == 0) {
+            if (out->repo_count == SETTINGS_PARSER_REPO_SIZE) {
+                error("Max number of repos (%d) exceeded\n", SETTINGS_PARSER_STRING_SIZE);
+                return -1;
+            }
             i++;
             if (copy_token(out->repos[out->repo_count].name, in, tokens[i]) == -1) {
-                error("Max string length exceeded, truncated 'name' %s\n", token_str);
+                error("Max string length exceeded for 'name' %s\n", token_str);
                 return -1;
             }
             got_name = 1;
 
         } else if (strcmp(token_str, "branch") == 0) {
+            if (out->repo_count == SETTINGS_PARSER_REPO_SIZE) {
+                error("Max number of repos (%d) exceeded\n", SETTINGS_PARSER_STRING_SIZE);
+                return -1;
+            }
             i++;
             if (copy_token(out->repos[out->repo_count].branch, in, tokens[i]) == -1) {
-                error("Max string length exceeded, truncated 'branch' %s\n", token_str);
+                error("Max string length exceeded for 'branch' %s\n", token_str);
                 return -1;
             }
             got_branch = 1;
