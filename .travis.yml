@@ -15,6 +15,8 @@ install:
     - export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
     # install coveralls upload tool
     - pip install --user cpp-coveralls
+    # install lcov
+    - sudo apt-get install -y lcov
 
 before_script:
     # make sure we end up in the project repository before building
