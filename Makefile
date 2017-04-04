@@ -36,7 +36,7 @@ bin: $(LIBCILAMP) $(LIBJSMN)
 
 coverage:
 	lcov --capture --rc lcov_branch_coverage=1 --directory . --follow --output-file coverage.info
-	genhtml coverage.info --rc genhtml_branch_coverage=1 --output-directory output
+	#genhtml coverage.info --rc genhtml_branch_coverage=1 --output-directory output
 
 clean:
 	make -C third_party/jsmn/ clean

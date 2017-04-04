@@ -25,4 +25,5 @@ script:
     - ./test/run_unit_tests.sh
 
 after_success:
-    - coveralls
+    - make coverage
+    - coveralls --exclude third_party --lcov-file coverage.info
