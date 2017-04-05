@@ -13,8 +13,6 @@ install:
     - cmake ..
     - sudo make install
     - export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
-    # install coveralls upload tool
-    - pip install --user cpp-coveralls
 
 before_script:
     # make sure we end up in the project repository before building
@@ -25,4 +23,5 @@ script:
     - ./test/run_unit_tests.sh
 
 after_success:
-    - coveralls --exclude third_party --exclude test --gcov-options '\-bclp'
+    - gcov -bclp lib/*.c bin/*.c
+    - bash <(curl -s https://codecov.io/bash)
