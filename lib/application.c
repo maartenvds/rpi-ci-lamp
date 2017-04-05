@@ -23,10 +23,8 @@ int application_init(struct Application *self, const char *settings_filename, co
     self->settings.repo_count = 0;
     lamp_control_init(&self->lamp_state);
 
-    if (https_request_init(&self->https, uri) == -1) {
-        https_request_deinit(&self->https);
+    if (https_request_init(&self->https, uri) == -1)
         return -1;
-    }
 
     return 0;
 }
@@ -99,7 +97,6 @@ static int application_routine(struct Application *self, enum BuildState *aggreg
 
         accumulate_build_state(aggregate_build_state, build_state);
     }
-
 
     return 0;
 }

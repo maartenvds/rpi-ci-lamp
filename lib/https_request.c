@@ -109,6 +109,8 @@ close_socket:
 
 void https_request_deinit(struct HttpsRequest *self)
 {
-    if (self->ssl_ctx)
+    if (self->ssl_ctx) {
         SSL_CTX_free(self->ssl_ctx);
+        self->ssl_ctx = NULL;
+    }
 }

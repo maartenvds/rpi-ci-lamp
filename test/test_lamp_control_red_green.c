@@ -9,6 +9,7 @@
 /*
  * Mocks
  */
+
 void lamp_io_init(void)
 {
 }
