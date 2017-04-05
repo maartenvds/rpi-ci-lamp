@@ -4,7 +4,6 @@
  */
 
 #include "logging.h"
-#include "lamp_io.h"
 #include "application.h"
 #include <signal.h>
 #include <unistd.h>
@@ -15,7 +14,7 @@ void int_handler(int dummy)
 {
     (void)dummy;
     application_deinit(&app);
-    lamp_control_off(&app.lamp_state);
+    lamp_control_off(&app.lamp_control);
     exit(0);
 }
 

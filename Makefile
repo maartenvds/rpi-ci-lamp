@@ -20,7 +20,7 @@ LDFLAGS += $(CMNFLAGS)
 
 export CFLAGS LDFLAGS LIBCILAMP LIBJSMN LDLIBS CC
 
-all: test bin
+all: bin
 
 $(LIBCILAMP):
 	make -C lib/
