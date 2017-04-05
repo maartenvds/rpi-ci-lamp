@@ -5,7 +5,6 @@
 #include "application.h"
 #include "response_parser.h"
 #include "read_file.h"
-#include "lamp_io.h"
 #include "logging.h"
 #include <string.h>
 #include <stdlib.h>
@@ -21,7 +20,7 @@ int application_init(struct Application *self, const char *settings_filename, co
     self->settings_filename = settings_filename;
     self->settings.interval = 1;
     self->settings.repo_count = 0;
-    lamp_control_init(&self->lamp_state);
+    lamp_control_init(&self->lamp_control);
 
     if (https_request_init(&self->https, uri) == -1)
         return -1;
@@ -106,9 +105,9 @@ int application_run(struct Application *self)
     enum BuildState aggregate_build_state;
 
     if (application_routine(self, &aggregate_build_state) == 0)
-        lamp_control_set_state(&self->lamp_state, aggregate_build_state);
+        lamp_control_set_state(&self->lamp_control, aggregate_build_state);
     else
-        lamp_control_signal_error(&self->lamp_state);
+        lamp_control_signal_error(&self->lamp_control);
 
     return self->settings.interval;
 }

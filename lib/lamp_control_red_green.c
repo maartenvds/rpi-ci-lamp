@@ -5,7 +5,6 @@
  */
 
 #include "lamp_control.h"
-#include "lamp_io_red_green.h"
 
 static void build_state_to_lamp_state(enum LampStateRedGreen *lamp_state, enum BuildState build_state)
 {
@@ -21,26 +20,34 @@ static void build_state_to_lamp_state(enum LampStateRedGreen *lamp_state, enum B
         *lamp_state = LAMP_STATE_BLINK_RED;
 }
 
-void lamp_control_init(int *lamp_state)
+int lamp_control_init(struct LampControl *self)
 {
-    lamp_io_init();
-    lamp_control_off(lamp_state);
+    if (lamp_io_red_green_init(&self->lamp_io) == -1)
+       return -1;
+
+    lamp_control_off(self);
+    return 0;
 }
 
-void lamp_control_set_state(int *lamp_state, enum BuildState build_state)
+void lamp_control_deinit(struct LampControl *self)
 {
-    build_state_to_lamp_state((enum LampStateRedGreen *)lamp_state, build_state);
-    lamp_io_set_state(*lamp_state);
+    lamp_io_red_green_deinit(&self->lamp_io);
 }
 
-void lamp_control_signal_error(int *lamp_state)
+void lamp_control_set_state(struct LampControl *self, enum BuildState build_state)
 {
-    *lamp_state = LAMP_STATE_ERROR;
-    lamp_io_set_state(*lamp_state);
+    build_state_to_lamp_state(&self->lamp_state, build_state);
+    lamp_io_red_green_set_state(&self->lamp_io, self->lamp_state);
 }
 
-void lamp_control_off(int *lamp_state)
+void lamp_control_signal_error(struct LampControl *self)
 {
-    *lamp_state = LAMP_STATE_OFF;
-    lamp_io_set_state(*lamp_state);
+    self->lamp_state = LAMP_STATE_ERROR;
+    lamp_io_red_green_set_state(&self->lamp_io, self->lamp_state);
+}
+
+void lamp_control_off(struct LampControl *self)
+{
+    self->lamp_state = LAMP_STATE_OFF;
+    lamp_io_red_green_set_state(&self->lamp_io, self->lamp_state);
 }

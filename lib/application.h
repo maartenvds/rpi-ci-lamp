@@ -16,7 +16,7 @@ struct Application
     struct HttpsRequest https;
     struct Settings settings;
     const char *settings_filename;
-    int lamp_state;
+    struct LampControl lamp_control;
 };
 
 /*
