@@ -25,4 +25,4 @@ script:
     - ./test/run_unit_tests.sh
 
 after_success:
-    - coveralls --exclude third_party --exclude test --gcov-options '\-lp'
+    - coveralls --exclude third_party --exclude test --gcov-options '\-bclp'
