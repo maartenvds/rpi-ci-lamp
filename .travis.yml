@@ -15,7 +15,7 @@ install:
     - export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
     # compile and install wiringPi
     - cd /tmp
-    - git clone git clone git://git.drogon.net/wiringPi
+    - git clone git://git.drogon.net/wiringPi
     - cd wiringPi
     - ./build
 
