@@ -1,5 +1,5 @@
 CC=gcc
-LDLIBS+= -lssl -lcrypto
+LDLIBS+= -lssl -lcrypto -lwiringPi -pthread -lrt -lm -lcrypt
 CFLAGS+= -I/usr/include/openssl
 CFLAGS+= -D_GNU_SOURCE
 CFLAGS+= -Wall -W -Wextra -Werror

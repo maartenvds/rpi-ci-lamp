@@ -1,7 +1,6 @@
 LIBDIR = ../lib
 JSMNDIR = ../third_party/jsmn
 CFLAGS += -I$(LIBDIR) -I$(JSMNDIR)
-LDLIBS += -lwiringPi -pthread
 
 all: main test_lamp_io_red_green
 

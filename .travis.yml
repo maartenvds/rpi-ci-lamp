@@ -13,6 +13,11 @@ install:
     - cmake ..
     - sudo make install
     - export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+    # compile and install wiringPi
+    - cd /tmp
+    - git clone git clone git://git.drogon.net/wiringPi
+    - cd wiringPi
+    - ./build
 
 before_script:
     # make sure we end up in the project repository before building
@@ -20,6 +25,7 @@ before_script:
 
 script:
     - make DEBUG=1
+    - make DEBUG=1 test
     - ./test/run_unit_tests.sh
 
 after_success:

@@ -3,7 +3,29 @@
 #include <setjmp.h>
 #include <cmocka.h>
 #include <stdlib.h>
+#include "lamp_io_red_green.h"
 #include "application.h"
+
+/*
+ *  Mocks
+ */
+
+int lamp_io_red_green_init(struct LampIoRedGreen *self)
+{
+    (void)self;
+    return 0;
+}
+
+void lamp_io_red_green_deinit(struct LampIoRedGreen *self)
+{
+    (void)self;
+}
+
+void lamp_io_red_green_set_state(struct LampIoRedGreen *self, enum LampStateRedGreen lamp_state)
+{
+    (void)self;
+    (void)lamp_state;
+}
 
 /*
  *  Test cases

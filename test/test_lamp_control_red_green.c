@@ -10,12 +10,20 @@
  * Mocks
  */
 
-void lamp_io_init(void)
+int lamp_io_red_green_init(struct LampIoRedGreen *self)
 {
+    (void)self;
+    return 0;
 }
 
-void lamp_io_set_state(int lamp_state)
+void lamp_io_red_green_deinit(struct LampIoRedGreen *self)
 {
+    (void)self;
+}
+
+void lamp_io_red_green_set_state(struct LampIoRedGreen *self, enum LampStateRedGreen lamp_state)
+{
+    (void)self;
     check_expected(lamp_state);
 }
 
@@ -40,128 +48,128 @@ void lamp_io_set_state(int lamp_state)
  */
 static void test_set_state_build_failed(void **state)
 {
-    int *lamp_state = *state;
+    struct LampControl *lamp_control = *state;
 
     /* setup */
-    expect_value(lamp_io_set_state, lamp_state, LAMP_STATE_RED);
+    expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_RED);
     /* act */
-    lamp_control_set_state(lamp_state, BUILD_STATE_FAILED);
+    lamp_control_set_state(lamp_control, BUILD_STATE_FAILED);
     /* assert */
-    assert_int_equal(*lamp_state, LAMP_STATE_RED);
+    assert_int_equal(lamp_control->lamp_state, LAMP_STATE_RED);
 }
 
 static void test_set_state_build_passed(void **state)
 {
-    int *lamp_state = *state;
+    struct LampControl *lamp_control = *state;
 
     /* setup */
-    expect_value(lamp_io_set_state, lamp_state, LAMP_STATE_GREEN);
+    expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_GREEN);
     /* act */
-    lamp_control_set_state(lamp_state, BUILD_STATE_PASSED);
+    lamp_control_set_state(lamp_control, BUILD_STATE_PASSED);
     /* assert */
-    assert_int_equal(*lamp_state, LAMP_STATE_GREEN);
+    assert_int_equal(lamp_control->lamp_state, LAMP_STATE_GREEN);
 }
 
 static void test_set_state_build_running_after_failed(void **state)
 {
-    int *lamp_state = *state;
+    struct LampControl *lamp_control = *state;
 
     /* setup */
-    *lamp_state = LAMP_STATE_RED;
-    expect_value(lamp_io_set_state, lamp_state, LAMP_STATE_BLINK_RED);
+    lamp_control->lamp_state = LAMP_STATE_RED;
+    expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_BLINK_RED);
     /* act */
-    lamp_control_set_state(lamp_state, BUILD_STATE_RUNNING);
+    lamp_control_set_state(lamp_control, BUILD_STATE_RUNNING);
     /* assert */
-    assert_int_equal(*lamp_state, LAMP_STATE_BLINK_RED);
+    assert_int_equal(lamp_control->lamp_state, LAMP_STATE_BLINK_RED);
 }
 
 static void test_set_state_build_running_after_passed(void **state)
 {
-    int *lamp_state = *state;
+    struct LampControl *lamp_control = *state;
 
     /* setup */
-    *lamp_state = LAMP_STATE_GREEN;
-    expect_value(lamp_io_set_state, lamp_state, LAMP_STATE_BLINK_GREEN);
+    lamp_control->lamp_state = LAMP_STATE_GREEN;
+    expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_BLINK_GREEN);
     /* act */
-    lamp_control_set_state(lamp_state, BUILD_STATE_RUNNING);
+    lamp_control_set_state(lamp_control, BUILD_STATE_RUNNING);
     /* assert */
-    assert_int_equal(*lamp_state, LAMP_STATE_BLINK_GREEN);
+    assert_int_equal(lamp_control->lamp_state, LAMP_STATE_BLINK_GREEN);
 }
 
 static void test_set_state_build_running_after_off(void **state)
 {
-    int *lamp_state = *state;
+    struct LampControl *lamp_control = *state;
 
     /* setup */
-    expect_value(lamp_io_set_state, lamp_state, LAMP_STATE_BLINK_GREEN);
+    expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_BLINK_GREEN);
     /* act */
-    lamp_control_set_state(lamp_state, BUILD_STATE_RUNNING);
+    lamp_control_set_state(lamp_control, BUILD_STATE_RUNNING);
     /* assert */
-    assert_int_equal(*lamp_state, LAMP_STATE_BLINK_GREEN);
+    assert_int_equal(lamp_control->lamp_state, LAMP_STATE_BLINK_GREEN);
 }
 
 static void test_set_state_build_running_after_error(void **state)
 {
-    int *lamp_state = *state;
+    struct LampControl *lamp_control = *state;
 
     /* setup */
-    *lamp_state = LAMP_STATE_ERROR;
-    expect_value(lamp_io_set_state, lamp_state, LAMP_STATE_BLINK_RED);
+    lamp_control->lamp_state = LAMP_STATE_ERROR;
+    expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_BLINK_RED);
     /* act */
-    lamp_control_set_state(lamp_state, BUILD_STATE_RUNNING);
+    lamp_control_set_state(lamp_control, BUILD_STATE_RUNNING);
     /* assert */
-    assert_int_equal(*lamp_state, LAMP_STATE_BLINK_RED);
+    assert_int_equal(lamp_control->lamp_state, LAMP_STATE_BLINK_RED);
 }
 
 static void test_set_state_build_running_after_blink_green(void **state)
 {
-    int *lamp_state = *state;
+    struct LampControl *lamp_control = *state;
 
     /* setup */
-    *lamp_state = LAMP_STATE_BLINK_GREEN;
-    expect_value(lamp_io_set_state, lamp_state, LAMP_STATE_BLINK_GREEN);
+    lamp_control->lamp_state = LAMP_STATE_BLINK_GREEN;
+    expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_BLINK_GREEN);
     /* act */
-    lamp_control_set_state(lamp_state, BUILD_STATE_RUNNING);
+    lamp_control_set_state(lamp_control, BUILD_STATE_RUNNING);
     /* assert */
-    assert_int_equal(*lamp_state, LAMP_STATE_BLINK_GREEN);
+    assert_int_equal(lamp_control->lamp_state, LAMP_STATE_BLINK_GREEN);
 }
 
 static void test_set_state_build_running_after_blink_red(void **state)
 {
-    int *lamp_state = *state;
+    struct LampControl *lamp_control = *state;
 
     /* setup */
-    *lamp_state = LAMP_STATE_BLINK_RED;
-    expect_value(lamp_io_set_state, lamp_state, LAMP_STATE_BLINK_RED);
+    lamp_control->lamp_state = LAMP_STATE_BLINK_RED;
+    expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_BLINK_RED);
     /* act */
-    lamp_control_set_state(lamp_state, BUILD_STATE_RUNNING);
+    lamp_control_set_state(lamp_control, BUILD_STATE_RUNNING);
     /* assert */
-    assert_int_equal(*lamp_state, LAMP_STATE_BLINK_RED);
+    assert_int_equal(lamp_control->lamp_state, LAMP_STATE_BLINK_RED);
 }
 
 static void test_signal_error(void **state)
 {
-    int *lamp_state = *state;
+    struct LampControl *lamp_control = *state;
 
     /* setup */
-    expect_value(lamp_io_set_state, lamp_state, LAMP_STATE_ERROR);
+    expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_ERROR);
     /* act */
-    lamp_control_signal_error(lamp_state);
+    lamp_control_signal_error(lamp_control);
     /* assert */
-    assert_int_equal(*lamp_state, LAMP_STATE_ERROR);
+    assert_int_equal(lamp_control->lamp_state, LAMP_STATE_ERROR);
 }
 
 static void test_lamp_off(void **state)
 {
-    int *lamp_state = *state;
+    struct LampControl *lamp_control = *state;
 
     /* setup */
-    *lamp_state = LAMP_STATE_RED;
-    expect_value(lamp_io_set_state, lamp_state, LAMP_STATE_OFF);
+    lamp_control->lamp_state = LAMP_STATE_RED;
+    expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_OFF);
     /* act */
-    lamp_control_off(lamp_state);
+    lamp_control_off(lamp_control);
     /* assert */
-    assert_int_equal(*lamp_state, LAMP_STATE_OFF);
+    assert_int_equal(lamp_control->lamp_state, LAMP_STATE_OFF);
 }
 
 /*
@@ -170,19 +178,20 @@ static void test_lamp_off(void **state)
 
 static int setup(void **state)
 {
-    int *lamp_state = malloc(sizeof(int));
-    assert_non_null(lamp_state);
-    *state = lamp_state;
+    struct LampControl *lamp_control = malloc(sizeof(struct LampControl));
+    assert_non_null(lamp_control);
+    *state = lamp_control;
 
-    expect_value(lamp_io_set_state, lamp_state, LAMP_STATE_OFF);
-    lamp_control_init(lamp_state);
-    assert_int_equal(*lamp_state, LAMP_STATE_OFF);
+    expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_OFF);
+    lamp_control_init(lamp_control);
+    assert_int_equal(lamp_control->lamp_state, LAMP_STATE_OFF);
 
     return 0;
 }
 
 static int teardown(void **state)
 {
+    lamp_control_deinit(*state);
     free(*state);
 
     return 0;
