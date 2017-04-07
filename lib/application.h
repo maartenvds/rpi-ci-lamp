@@ -23,9 +23,10 @@ struct Application
  *  self:               application instance
  *  settings_filename:  filename of the settings file
  *  uri:                uri of the build server
+ *  port:               build server TCP port
  *  return: zero on success, non zero on failure
  */
-int application_init(struct Application *self, const char *settings_filename, const char *uri);
+int application_init(struct Application *self, const char *settings_filename, const char *uri, unsigned short port);
 
 /*
  *  self:   application instance
