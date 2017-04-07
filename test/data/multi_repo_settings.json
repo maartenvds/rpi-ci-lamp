@@ -1,0 +1,14 @@
+{
+    "interval":5,
+    "repos":
+    [
+        {
+            "name":"maartenvds/rpi-ci-lamp",
+            "branch":"master"
+        },
+        {
+            "name":"maartenvds/rpi-ci-lamp",
+            "branch":"dev"
+        }
+    ]
+}

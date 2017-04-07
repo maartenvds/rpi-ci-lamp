@@ -1,20 +1,23 @@
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 import ssl
 
+FILE_PREFIX = "test/data/"
+
 class RequestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
-        #self.protocol_version = 'HTTP/1.1'
         self.send_response(200)
         self.send_header('Content-type','text/html')
         self.end_headers()
         # Send the html message
-        with open("content.txt", "r") as f:
+        branch = self.path.split('/')[-1]
+        print branch
+        with open(FILE_PREFIX + branch, "r") as f:
             self.wfile.write(f.read())
 
 try:
     server = HTTPServer(('localhost', 4443), RequestHandler)
-    server.socket = ssl.wrap_socket(server.socket, certfile='server.pem', server_side=True)
+    server.socket = ssl.wrap_socket(server.socket, certfile=FILE_PREFIX + 'server.pem', server_side=True)
     server.serve_forever()
 
 except KeyboardInterrupt:

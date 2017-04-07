@@ -30,6 +30,7 @@ void lamp_io_red_green_set_state(struct LampIoRedGreen *self, enum LampStateRedG
 /*
  *  Test cases
  */
+
 static void test_dummy(void **state)
 {
     (void)state;
