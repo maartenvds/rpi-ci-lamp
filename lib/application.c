@@ -10,19 +10,19 @@
 #include <stdlib.h>
 
 #define MAX_REPONSE_SIZE    4000
-#define REQUEST_TEMPLATE   "GET /repos/%s/branches/%s HTTP/1.1\r\n" \
+#define REQUEST_TEMPLATE   "GET /repos/%s/branches/%s HTTP/1.0\r\n" \
                             "User-Agent: MyClient/1.0.0\r\n" \
                             "Accept: application/vnd.travis-ci.2+json\r\n" \
                             "Host: api.travis-ci.org\r\n\r\n"
 
-int application_init(struct Application *self, const char *settings_filename, const char *uri)
+int application_init(struct Application *self, const char *settings_filename, const char *uri, unsigned short port)
 {
     self->settings_filename = settings_filename;
     self->settings.interval = 1;
     self->settings.repo_count = 0;
     lamp_control_init(&self->lamp_control);
 
-    if (https_request_init(&self->https, uri) == -1)
+    if (https_request_init(&self->https, uri, port) == -1)
         return -1;
 
     return 0;
@@ -36,9 +36,10 @@ void application_deinit(struct Application *self)
 static void accumulate_build_state(enum BuildState *aggregate_build_state, enum BuildState build_state)
 {
     const int map[3][3] = {
-        {   BUILD_STATE_FAILED,     BUILD_STATE_RUNNING,    BUILD_STATE_FAILED  },
-        {   BUILD_STATE_RUNNING,    BUILD_STATE_RUNNING,    BUILD_STATE_RUNNING },
-        {   BUILD_STATE_FAILED,     BUILD_STATE_RUNNING,    BUILD_STATE_PASSED  }};
+        /*  failed                  running                 passed  -> build_state */
+        {   BUILD_STATE_FAILED,     BUILD_STATE_RUNNING,    BUILD_STATE_FAILED  },  /* failed */
+        {   BUILD_STATE_RUNNING,    BUILD_STATE_RUNNING,    BUILD_STATE_RUNNING },  /* running */
+        {   BUILD_STATE_FAILED,     BUILD_STATE_RUNNING,    BUILD_STATE_PASSED  }}; /* passed */
 
     *aggregate_build_state = map[*aggregate_build_state][build_state];
 }
