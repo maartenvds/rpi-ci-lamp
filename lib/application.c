@@ -10,19 +10,25 @@
 #include <stdlib.h>
 
 #define MAX_REPONSE_SIZE    4000
-#define REQUEST_TEMPLATE   "GET /repos/%s/branches/%s HTTP/1.0\r\n" \
-                            "User-Agent: MyClient/1.0.0\r\n" \
-                            "Accept: application/vnd.travis-ci.2+json\r\n" \
-                            "Host: api.travis-ci.org\r\n\r\n"
 
-int application_init(struct Application *self, const char *settings_filename, const char *uri, unsigned short port)
+int application_init(struct Application *self, const char *settings_filename, const char *uri, int disable_cert_verify)
 {
+    struct curl_slist *chunk = NULL;
+
     self->settings_filename = settings_filename;
     self->settings.interval = 1;
     self->settings.repo_count = 0;
+    self->uri = uri;
+
+    /* travis specific HTTP request headers */
+    chunk = curl_slist_append(chunk, "User-Agent: MyClient/1.0.0");
+    chunk = curl_slist_append(chunk, "Accept: application/vnd.travis-ci.2+json");
+    chunk = curl_slist_append(chunk, "Host: api.travis-ci.org");
+    self->request_headers = chunk;
+
     lamp_control_init(&self->lamp_control);
 
-    if (https_request_init(&self->https, uri, port) == -1)
+    if (https_request_init(&self->https, disable_cert_verify) == -1)
         return -1;
 
     return 0;
@@ -30,6 +36,7 @@ int application_init(struct Application *self, const char *settings_filename, co
 
 void application_deinit(struct Application *self)
 {
+    curl_slist_free_all(self->request_headers);
     https_request_deinit(&self->https);
 }
 
@@ -48,8 +55,7 @@ static int application_routine(struct Application *self, enum BuildState *aggreg
 {
     int i, res;
     enum BuildState build_state;
-    const char *request_fmt = REQUEST_TEMPLATE;
-    char *request, *settings_str;
+    char *complete_uri, *settings_str;
     char response[MAX_REPONSE_SIZE];
 
     /* read settings */
@@ -75,15 +81,15 @@ static int application_routine(struct Application *self, enum BuildState *aggreg
         char *branch = self->settings.repos[i].branch;
 
         /* construct HTTP request */
-        res = asprintf(&request, request_fmt, name, branch);
+        res = asprintf(&complete_uri, "%s/repos/%s/branches/%s", self->uri, name, branch);
         if (res <= 0) {
-            error("Failed constructing HTTP request\n");
+            error("Failed constructing HTTP URI\n");
             return -1;
         }
 
         /* perform HTTP request */
-        res = https_request_get(&self->https, request, response, MAX_REPONSE_SIZE);
-        free(request);
+        res = https_request_get(&self->https, complete_uri, self->request_headers, response, MAX_REPONSE_SIZE);
+        free(complete_uri);
         if (res == -1) {
             error("Request for '%s','%s' failed\n", name, branch);
             return -1;

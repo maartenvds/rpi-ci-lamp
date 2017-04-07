@@ -5,112 +5,108 @@
 
 #include "https_request.h"
 #include "logging.h"
-
 #include <string.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <errno.h>
-#include <openssl/err.h>
 
-int https_request_init(struct HttpsRequest *self, const char* uri)
+#define MIN(a,b) \
+   ({   __typeof__ (a) _a = (a); \
+        __typeof__ (b) _b = (b); \
+        _a < _b ? _a : _b; })
+
+static size_t write_function(void *in, size_t size, size_t nmemb, struct HttpsRequest *self)
 {
-    struct hostent *host;
+    size_t len = MIN(size * nmemb, self->response_size - self->bytes_read - 1);
 
-    OpenSSL_add_all_algorithms();
-    SSL_load_error_strings();
-    (void)SSL_library_init();
-    self->ssl_ctx = SSL_CTX_new (SSLv23_client_method());
+    memcpy(&self->response[self->bytes_read], in, len);
 
-    if (!self->ssl_ctx) {
-        error("Failed to create new SSL context\n");
+    self->bytes_read += len;
+    self->response[self->bytes_read] = '\0';
+
+    /* actual number of copied bytes */
+    return len;
+}
+
+int https_request_init(struct HttpsRequest *self, int disable_cert_verify)
+{
+    CURLcode res;
+    long verify = disable_cert_verify ? 0L : 1L;
+
+    self->curl = curl_easy_init();
+    if (!self->curl) {
+        error("Curl init failed\n");
         return -1;
     }
 
-    /* resolve uri */
-    if ((host = gethostbyname(uri)) == NULL) {
-        error("Failed to resolve hostname '%s'\n", uri);
+    res = curl_easy_setopt(self->curl, CURLOPT_WRITEFUNCTION, write_function);
+    if (res != CURLE_OK) {
+        error("Failed to register curl write function: %s\n", curl_easy_strerror(res));
         return -1;
     }
 
-    memset(&self->server, 0, sizeof(self->server));
-    self->server.sin_family = AF_INET;
-    memcpy(&self->server.sin_addr, host->h_addr, host->h_length);
-    self->server.sin_port = htons( 443 );
+    res = curl_easy_setopt(self->curl, CURLOPT_WRITEDATA, self);
+    if (res != CURLE_OK) {
+        error("Failed to set write function arguments: %s\n", curl_easy_strerror(res));
+        return -1;
+    }
+
+    res = curl_easy_setopt(self->curl, CURLOPT_SSL_VERIFYPEER, verify);
+    if (res != CURLE_OK) {
+        error("Failed to enable/disable SSL certificate verification: %s\n", curl_easy_strerror(res));
+        return -1;
+    }
 
     return 0;
 }
 
-int https_request_get(struct HttpsRequest *self, const char *request, char *response, size_t response_size)
+int https_request_get(struct HttpsRequest *self, const char *uri, struct curl_slist *request_headers,
+                                                                char *response, size_t response_size)
 {
-    size_t len;
-    int res = 0;
-    int sock;
+    CURLcode res;
+    long http_code = 0;
 
-    sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock == -1) {
-        error("Failed to create a socket: %s\n", strerror(errno));
+    res = curl_easy_setopt(self->curl, CURLOPT_URL, uri);
+    if (res != CURLE_OK) {
+        error("Failed to set uri: %s\n", curl_easy_strerror(res));
         return -1;
     }
 
-    if (connect(sock , (struct sockaddr *)&self->server, sizeof(self->server)) < 0) {
-        error("Failed to open connection: %s\n", strerror(errno));
-        res = -1;
-        goto close_socket;
+    /* construct header */
+    if (request_headers) {
+        res = curl_easy_setopt(self->curl, CURLOPT_HTTPHEADER, request_headers);
+        if (res != CURLE_OK) {
+            error("Failed constructing custom header: %s\n", curl_easy_strerror(res));
+            return -1;
+        }
     }
 
-    SSL *conn = SSL_new(self->ssl_ctx);
-
-    if (!conn) {
-        error("Failed to create new SSL socket\n");
-        res = -1;
-        goto shutdown_ssl_connection;
+    /* perform request */
+    self->response = response;
+    self->response_size = response_size;
+    self->bytes_read = 0;
+    res = curl_easy_perform(self->curl);
+    if (res != CURLE_OK) {
+        error("Https request failed: %s\n", curl_easy_strerror(res));
+        return -1;
     }
 
-    if (!SSL_set_fd(conn, sock)) {
-        error("Failed to set SSL socket\n");
-        res = -1;
-        goto shutdown_ssl_connection;
+    /* check HTTP response code */
+    res = curl_easy_getinfo(self->curl, CURLINFO_RESPONSE_CODE, &http_code);
+    if (res != CURLE_OK) {
+        error("Failed to get HTTP response code: %s\n", curl_easy_strerror(res));
+        return -1;
     }
 
-    if (!SSL_connect(conn)) {
-        error("Failed to open SSL connection\n");
-        res = -1;
-        goto shutdown_ssl_connection;
+    if (http_code != 200) {
+        error("HTTP response code is not 200, got %ld\n", http_code);
+        return -1;
     }
 
-    if (SSL_write(conn, request, strlen(request)) <= 0) {
-        error("Failed to send request\n");
-        res = -1;
-        goto shutdown_ssl_connection;
-    }
-
-    len = SSL_read(conn, response, response_size);
-    if (len <= 0) {
-        error("Failed to receive response\n");
-        res = -1;
-        goto shutdown_ssl_connection;
-
-    } else if (len == response_size) {
-        response[len-1] = '\0';
-    } else {
-        response[len] = '\0';
-    }
-
-shutdown_ssl_connection:
-    (void)SSL_shutdown(conn);
-
-    SSL_free(conn);
-
-close_socket:
-    close(sock);
-
-    return res;
+    return 0;
 }
 
 void https_request_deinit(struct HttpsRequest *self)
 {
-    if (self->ssl_ctx) {
-        SSL_CTX_free(self->ssl_ctx);
-        self->ssl_ctx = NULL;
+    if (self->curl) {
+        curl_easy_cleanup(self->curl);
+        self->curl = NULL;
     }
 }
