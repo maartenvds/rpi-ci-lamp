@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 
     signal(SIGINT, int_handler);
 
-    if (application_init(&app, "settings.json", "https://api.travis-ci.org", 0) == -1) {
+    if (application_init(&app, "settings.json", "https://localhost:4443", 1) == -1) {
         application_deinit(&app);
         error("Initialization failed\n");
         return -1;
