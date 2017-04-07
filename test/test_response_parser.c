@@ -8,28 +8,6 @@
 #include "response_parser.h"
 
 #define BIG_RESPONSE_STRING \
-    "HTTP/1.1 %s OK\r\n" \
-    "Connection: keep-alive\r\n" \
-    "Server: nginx\r\n" \
-    "Date: Thu, 23 Mar 2017 14:34:55 GMT\r\n" \
-    "Content-Type: application/json;charset=utf-8\r\n" \
-    "Content-Length: 1133\r\n" \
-    "Access-Control-Allow-Origin: *\r\n" \
-    "Access-Control-Allow-Credentials: true\r\n" \
-    "Access-Control-Expose-Headers: Content-Type, Cache-Control, Expires, Etag, Last-Modified\r\n" \
-    "Strict-Transport-Security: max-age=31536000\r\n" \
-    "X-Endpoint: Travis::Api::App::Endpoint::Repos\r\n" \
-    "X-Pattern: /:owner_name/:name/branches/*\r\n" \
-    "X-Oauth-Scopes: public\r\n" \
-    "X-Accepted-Oauth-Scopes: public\r\n" \
-    "Vary: Accept,Accept-Encoding\r\n" \
-    "Cache-Control: no-cache\r\n" \
-    "Etag: \"35df894ec5c29956cff5a6b60b68b374\"\r\n" \
-    "X-Content-Digest: f202e0ba7b10da961766be41a9c22d17500ae6d8\r\n" \
-    "Age: 0\r\n" \
-    "X-Rack-Cache: miss, store\r\n" \
-    "Via: 1.1 vegur\r\n" \
-    "%s" \
     "{\"branch\":{\"id\":214119164,\"repository_id\":119756,\"commit_id\":61565287,\"number\":\"4880\",\"config\"" \
     ":{\"language\":\"ruby\",\"sudo\":false,\"rvm\":\"2.3.3\",\"cache\":\"bundler\",\"addons\":{\"postgresql\"" \
     ":9.3},\"services\":[\"redis\"],\"before_script\":[\"RAILS_ENV=test bundle exec rake db:create--trace\"],\"" \
@@ -50,7 +28,7 @@ static void test_response_parser_passed(void **state)
     char *in;
 
     /* setup */
-    res = asprintf(&in, BIG_RESPONSE_STRING, "200", "\r\n", "state", "passed");
+    res = asprintf(&in, BIG_RESPONSE_STRING, "state", "passed");
     assert_true(res > 0);
 
     /* act */
@@ -70,7 +48,7 @@ static void test_response_parser_failed(void **state)
     char *in;
 
     /* setup */
-    res = asprintf(&in, BIG_RESPONSE_STRING, "200", "\r\n", "state", "failed");
+    res = asprintf(&in, BIG_RESPONSE_STRING, "state", "failed");
     assert_true(res > 0);
 
     /* act */
@@ -90,7 +68,7 @@ static void test_response_parser_running1(void **state)
     char *in;
 
     /* setup */
-    res = asprintf(&in, BIG_RESPONSE_STRING, "200", "\r\n", "state", "created");
+    res = asprintf(&in, BIG_RESPONSE_STRING, "state", "created");
     assert_true(res > 0);
 
     /* act */
@@ -110,7 +88,7 @@ static void test_response_parser_running2(void **state)
     char *in;
 
     /* setup */
-    res = asprintf(&in, BIG_RESPONSE_STRING, "200", "\r\n", "state", "started");
+    res = asprintf(&in, BIG_RESPONSE_STRING, "state", "started");
     assert_true(res > 0);
 
     /* act */
@@ -122,44 +100,6 @@ static void test_response_parser_running2(void **state)
     assert_int_equal(build_state, BUILD_STATE_RUNNING);
 }
 
-static void test_response_parser_bad_reponse_code(void **state)
-{
-    (void)state;
-    int res;
-    enum BuildState build_state;
-    char *in;
-
-    /* setup */
-    res = asprintf(&in, BIG_RESPONSE_STRING, "404", "\r\n", "state", "failed");
-    assert_true(res > 0);
-
-    /* act */
-    res = response_parser_build_result(in, &build_state);
-    free(in);
-
-    /* assert */
-    assert_int_equal(res, -1);
-}
-
-static void test_response_parser_end_of_http_header_not_found(void **state)
-{
-    (void)state;
-    int res;
-    enum BuildState build_state;
-    char *in;
-
-    /* setup */
-    res = asprintf(&in, BIG_RESPONSE_STRING, "200", "", "state", "failed");
-    assert_true(res > 0);
-
-    /* act */
-    res = response_parser_build_result(in, &build_state);
-    free(in);
-
-    /* assert */
-    assert_int_equal(res, -1);
-}
-
 static void test_response_parser_state_token_not_found(void **state)
 {
     (void)state;
@@ -168,7 +108,7 @@ static void test_response_parser_state_token_not_found(void **state)
     char *in;
 
     /* setup */
-    res = asprintf(&in, BIG_RESPONSE_STRING, "200", "\r\n", "unknown", "failed");
+    res = asprintf(&in, BIG_RESPONSE_STRING, "unknown", "failed");
     assert_true(res > 0);
 
     /* act */
@@ -186,8 +126,6 @@ int main(void)
         cmocka_unit_test(test_response_parser_failed),
         cmocka_unit_test(test_response_parser_running1),
         cmocka_unit_test(test_response_parser_running2),
-        cmocka_unit_test(test_response_parser_bad_reponse_code),
-        cmocka_unit_test(test_response_parser_end_of_http_header_not_found),
         cmocka_unit_test(test_response_parser_state_token_not_found),
     };
 

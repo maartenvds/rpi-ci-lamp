@@ -44,8 +44,8 @@ static int setup(void **state)
     int res;
     struct Application *app = malloc(sizeof(struct Application));
     assert_non_null(app);
-    res = application_init(app, "dummy_filename", "dummy_uri");
-    assert_int_equal(res, -1);
+    res = application_init(app, "dummy_filename", "dummy_uri", 0);
+    assert_int_equal(res, 0);
     *state = app;
     return 0;
 }

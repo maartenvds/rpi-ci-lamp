@@ -7,6 +7,7 @@
 #include "application.h"
 #include <signal.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 static struct Application app;
 
@@ -26,7 +27,7 @@ int main(int argc, char *argv[])
 
     signal(SIGINT, int_handler);
 
-    if (application_init(&app, "settings.json", "api.travis-ci.org") == -1) {
+    if (application_init(&app, "settings.json", "https://api.travis-ci.org", 0) == -1) {
         application_deinit(&app);
         error("Initialization failed\n");
         return -1;

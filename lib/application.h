@@ -16,17 +16,19 @@ struct Application
     struct HttpsRequest https;
     struct Settings settings;
     const char *settings_filename;
+    const char *uri;
+    struct curl_slist *request_headers;
     struct LampControl lamp_control;
 };
 
 /*
- *  self:               application instance
- *  settings_filename:  filename of the settings file
- *  uri:                uri of the build server
- *  port:               build server TCP port
+ *  self:                   application instance
+ *  settings_filename:      filename of the settings file
+ *  uri:                    server uri
+ *  disable_cert_verify:    disable server vertificate verification
  *  return: zero on success, non zero on failure
  */
-int application_init(struct Application *self, const char *settings_filename, const char *uri, unsigned short port);
+int application_init(struct Application *self, const char *settings_filename, const char *uri, int disable_cert_verify);
 
 /*
  *  self:   application instance
