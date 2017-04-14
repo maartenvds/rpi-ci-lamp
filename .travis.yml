@@ -1,5 +1,4 @@
 dist: trusty
-sudo: required
 language: c
 
 install:
@@ -10,22 +9,16 @@ install:
     - cd cmocka-1.1.0
     - mkdir build
     - cd build
-    - cmake ..
-    - sudo make install
-    - export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
-    # compile and install wiringPi
-    - cd /tmp
-    - git clone git://git.drogon.net/wiringPi
-    - cd wiringPi
-    - ./build
+    - cmake -DCMAKE_INSTALL_PREFIX=/tmp/cmocka ..
+    - make install
+    - export LD_LIBRARY_PATH="/tmp/cmocka/lib:$LD_LIBRARY_PATH"
 
 before_script:
     # make sure we end up in the project repository before building
     - cd $TRAVIS_BUILD_DIR
 
 script:
-    - make DEBUG=1
-    - make DEBUG=1 test
+    - make DEBUG=1 NOWIRINGPI=1 test
     - ./test/run_unit_tests.sh
 
 after_success:
