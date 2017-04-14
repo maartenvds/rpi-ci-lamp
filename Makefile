@@ -1,5 +1,5 @@
 CC=gcc
-LDLIBS+= -lcurl -lwiringPi -pthread -lrt -lm -lcrypt
+LDLIBS+= -lcurl -pthread
 CFLAGS+=
 CFLAGS+= -D_GNU_SOURCE
 CFLAGS+= -Wall -W -Wextra -Werror
@@ -20,7 +20,7 @@ LDFLAGS += $(CMNFLAGS)
 
 export CFLAGS LDFLAGS LIBCILAMP LIBJSMN LDLIBS CC
 
-all: bin
+all: $(LIBCILAMP)
 
 $(LIBCILAMP):
 	make -C lib/
