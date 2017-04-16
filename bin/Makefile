@@ -1,5 +1,7 @@
 LIBDIR = ../lib
-LDLIBS+= -lwiringPi -lrt -lm -lcrypt
+ifeq ($(NOWIRINGPI), 0)
+	LDLIBS += -lwiringPi -lrt -lm -lcrypt
+endif
 JSMNDIR = ../third_party/jsmn
 CFLAGS += -I$(LIBDIR) -I$(JSMNDIR)
 
