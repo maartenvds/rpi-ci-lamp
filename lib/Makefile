@@ -1,13 +1,13 @@
 LIBSRC=$(wildcard *.c)
-LIBOBJ=$(LIBSRC:.c=.o)
-JSMNDIR = ../third_party/jsmn
-CFLAGS += -I$(JSMNDIR)
-
 ifeq ($(NOWIRINGPI), 1)
 	# include dummy wiringPi.h header file
-	CFLAGS += -I../test
+	CFLAGS += -I.
+else
+	LIBSRC := $(filter-out wiringPi.c, $(LIBSRC))
 endif
 
+LIBOBJ=$(LIBSRC:.c=.o)
+CFLAGS += -I../third_party/jsmn
 
 $(LIBCILAMP): $(LIBOBJ)
 	ar rcs $@ $(LIBOBJ)
