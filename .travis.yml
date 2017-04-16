@@ -1,6 +1,10 @@
 dist: trusty
 language: c
 
+addons:
+    apt:
+        packages:
+            - libcurl4-openssl-dev
 install:
     # compile and install cmocka test framework
     - cd $HOME
