@@ -1,14 +1,9 @@
 dist: trusty
-sudo: required
 language: c
 
-# Coverity scan config, only usefull on the 'coverity_scan' branch
 env:
     global:
         - secure: "SiZhIqrfQDLTKMR61yqeJZufmaqsJD00GCvj8+RS9JY6IVsPODVO02rxJezPXVx7EJAO8YSD0eLUcJv5MJWoVmBqHJhZrB2viqBUQd2KS5tqlAFk2TjQDa2L0FqU/vWZP10vU1prmJqlWJvRHyjadWac6mDFgdREcQ3GH+gq5KcrjyqQ7D3qKYLsqbFef4fXKjm4EhO5JopRAlVcEiw6U584oBb9diXoJ1nCHN6Glvq6rGM8F2Uln4Ykm0ekPtUi6hqZQsgWYGCPm/x9Z0FRHBXzfg66hl2F0tUY6tu0H5/0rCVjDQwxAZpDlwNfYEq/DVLL+ADZz9cGUvefxAs5hI2ckaTBx+cNnERia2CiyqdTqG2esaWgQZ3XVKjR/q3DR1BEdz0anptdhTd6w6FN0QmAkabhtTTeLIbqed4QY/NDnemeL8NgoWCRZ5FgpaA6VPW8AQXBZk88xus9SrorS5Tl5R2GukuZ5qehVzGSP5AhAKfJAzQbA5kJv4aT66dX9PqoIgkkDvR01yEq/d5ksuaK0Jn8sAkoE2bceQH1EcvNLEwqMk0/bGD1tZXmZuG+OH5fpuWq2n0z8RXkudJW5GyHvQORmUq3XvfUDq+3W97qHhI0noNvRQpFZ2VC24dvv97yMKG9eKxT9N93zXZ+9/yUJpkBnLK90ZQS1A4Vom4="
-
-before_install:
-    - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 
 addons:
     coverity_scan:
@@ -17,29 +12,34 @@ addons:
             description: "Raspberry pi based CI-lamp for monitoring travis builds"
         notification_email: maarten.vandersteegen@kuleuven.be
         build_command_prepend: "make clean"
-        build_command:   "make DEBUG=1"
+        build_command:   "make DEBUG=1 NOWIRINGPI=1"
         branch_pattern: coverity_scan
+    apt:
+        packages:
+            - libcurl4-openssl-dev
 
-# end coverity scan config
+before_install:
+    - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 
 install:
     # compile and install cmocka test framework
-    - cd /tmp
+    - cd $HOME
     - wget https://cmocka.org/files/1.1/cmocka-1.1.0.tar.xz
     - tar -xvf cmocka-1.1.0.tar.xz
     - cd cmocka-1.1.0
     - mkdir build
     - cd build
-    - cmake ..
-    - sudo make install
-    - export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+    - cmake -DCMAKE_INSTALL_PREFIX=/tmp/cmocka ..
+    - make install
+    - export LD_LIBRARY_PATH="/tmp/cmocka/lib:$LD_LIBRARY_PATH"
+    - export PKG_CONFIG_PATH="/tmp/cmocka/lib/pkgconfig"
 
 before_script:
     # make sure we end up in the project repository before building
     - cd $TRAVIS_BUILD_DIR
 
 script:
-    - make DEBUG=1
+    - make DEBUG=1 NOWIRINGPI=1 test
     - ./test/run_unit_tests.sh
 
 after_success:

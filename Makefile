@@ -1,6 +1,6 @@
 CC=gcc
-LDLIBS+= -lssl -lcrypto
-CFLAGS+= -I/usr/include/openssl
+LDLIBS+= -lcurl -pthread
+CFLAGS+=
 CFLAGS+= -D_GNU_SOURCE
 CFLAGS+= -Wall -W -Wextra -Werror
 LDFLAGS+=
@@ -20,7 +20,7 @@ LDFLAGS += $(CMNFLAGS)
 
 export CFLAGS LDFLAGS LIBCILAMP LIBJSMN LDLIBS CC
 
-all: test bin
+all: $(LIBCILAMP) bin
 
 $(LIBCILAMP):
 	make -C lib/
