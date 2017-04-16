@@ -1,5 +1,5 @@
 # Binaries
-bin/main
+bin/rpi-ci-lamp
 bin/test_lamp_io_red_green
 test/test_response_parser
 test/test_settings_parser
