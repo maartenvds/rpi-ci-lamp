@@ -1,5 +1,5 @@
 /*
- *  Read text file into buffer
+ *  Read small text file into buffer
  *  Author: Maarten Vandersteege
  */
 #include "read_file.h"
@@ -10,10 +10,13 @@ char *read_file(const char *name)
 {
     long int fsize;
     char *string;
-    FILE *f = fopen(name, "rb");
+    FILE *f;
+
+    f = fopen(name, "rb");
     if (!f)
         return NULL;
 
+    /* calc file size */
     fseek(f, 0, SEEK_END);
     fsize = ftell(f);
     if (fsize < 0) {
@@ -21,17 +24,20 @@ char *read_file(const char *name)
         return NULL;
     }
 
-    fseek(f, 0, SEEK_SET);  /* same as rewind(f); */
-
     string = malloc((size_t)fsize + 1);
-    if (!string)
+    if (!string) {
+        fclose(f);
         return NULL;
+    }
 
-    if (fread(string, (size_t)fsize, 1, f) == 0)
+    rewind(f);
+    if (fread(string, (size_t)fsize, 1, f) != 1) {
+        free(string);
+        fclose(f);
         return NULL;
+    }
 
     fclose(f);
-
     string[fsize] = 0;
 
     return string;

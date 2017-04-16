@@ -5,6 +5,10 @@
         {
             "name":"maartenvds/rpi-ci-lamp",
             "branch":"master"
+        },
+        {
+            "name":"maartenvds/rpi-ci-lamp",
+            "branch":"development"
         }
     ]
 }
