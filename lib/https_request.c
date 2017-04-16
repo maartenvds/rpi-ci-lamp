@@ -30,6 +30,12 @@ int https_request_init(struct HttpsRequest *self, int disable_cert_verify)
     CURLcode res;
     long verify = disable_cert_verify ? 0L : 1L;
 
+    res = curl_global_init(CURL_GLOBAL_DEFAULT);
+    if (res != CURLE_OK) {
+        error("Curl global init failed: %s\n", curl_easy_strerror(res));
+        return -1;
+    }
+
     self->curl = curl_easy_init();
     if (!self->curl) {
         error("Curl init failed\n");
@@ -108,5 +114,6 @@ void https_request_deinit(struct HttpsRequest *self)
     if (self->curl) {
         curl_easy_cleanup(self->curl);
         self->curl = NULL;
+        curl_global_cleanup();
     }
 }
