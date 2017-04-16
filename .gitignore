@@ -7,6 +7,11 @@ test/test_lamp_control_red_green
 test/test_application
 test/test_system
 
+# generated symlinks
+test/data/settings.json
+test/data/master
+test/data/dev
+
 # Coverage files
 output
 coverage.info
