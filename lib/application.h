@@ -18,7 +18,7 @@ struct Application
     const char *settings_filename;
     const char *uri;
     struct curl_slist *request_headers;
-    struct LampControl lamp_control;
+    void *lamp_control;
 };
 
 /*

@@ -3,8 +3,7 @@
 #include <setjmp.h>
 #include <cmocka.h>
 #include <stdlib.h>
-#include "lamp_control.h"
-#include "lamp_io_red_green.h"
+#include "lamp_control_red_green.h"
 
 /*
  * Mocks
@@ -48,7 +47,7 @@ void lamp_io_red_green_set_state(struct LampIoRedGreen *self, enum LampStateRedG
  */
 static void test_set_state_build_failed(void **state)
 {
-    struct LampControl *lamp_control = *state;
+    struct LampControlRedGreen *lamp_control = *state;
 
     /* setup */
     expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_RED);
@@ -60,7 +59,7 @@ static void test_set_state_build_failed(void **state)
 
 static void test_set_state_build_passed(void **state)
 {
-    struct LampControl *lamp_control = *state;
+    struct LampControlRedGreen *lamp_control = *state;
 
     /* setup */
     expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_GREEN);
@@ -72,7 +71,7 @@ static void test_set_state_build_passed(void **state)
 
 static void test_set_state_build_running_after_failed(void **state)
 {
-    struct LampControl *lamp_control = *state;
+    struct LampControlRedGreen *lamp_control = *state;
 
     /* setup */
     lamp_control->lamp_state = LAMP_STATE_RED;
@@ -85,7 +84,7 @@ static void test_set_state_build_running_after_failed(void **state)
 
 static void test_set_state_build_running_after_passed(void **state)
 {
-    struct LampControl *lamp_control = *state;
+    struct LampControlRedGreen *lamp_control = *state;
 
     /* setup */
     lamp_control->lamp_state = LAMP_STATE_GREEN;
@@ -98,7 +97,7 @@ static void test_set_state_build_running_after_passed(void **state)
 
 static void test_set_state_build_running_after_off(void **state)
 {
-    struct LampControl *lamp_control = *state;
+    struct LampControlRedGreen *lamp_control = *state;
 
     /* setup */
     expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_BLINK_GREEN);
@@ -110,7 +109,7 @@ static void test_set_state_build_running_after_off(void **state)
 
 static void test_set_state_build_running_after_error(void **state)
 {
-    struct LampControl *lamp_control = *state;
+    struct LampControlRedGreen *lamp_control = *state;
 
     /* setup */
     lamp_control->lamp_state = LAMP_STATE_ERROR;
@@ -123,7 +122,7 @@ static void test_set_state_build_running_after_error(void **state)
 
 static void test_set_state_build_running_after_blink_green(void **state)
 {
-    struct LampControl *lamp_control = *state;
+    struct LampControlRedGreen *lamp_control = *state;
 
     /* setup */
     lamp_control->lamp_state = LAMP_STATE_BLINK_GREEN;
@@ -136,7 +135,7 @@ static void test_set_state_build_running_after_blink_green(void **state)
 
 static void test_set_state_build_running_after_blink_red(void **state)
 {
-    struct LampControl *lamp_control = *state;
+    struct LampControlRedGreen *lamp_control = *state;
 
     /* setup */
     lamp_control->lamp_state = LAMP_STATE_BLINK_RED;
@@ -149,7 +148,7 @@ static void test_set_state_build_running_after_blink_red(void **state)
 
 static void test_signal_error(void **state)
 {
-    struct LampControl *lamp_control = *state;
+    struct LampControlRedGreen *lamp_control = *state;
 
     /* setup */
     expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_ERROR);
@@ -161,7 +160,7 @@ static void test_signal_error(void **state)
 
 static void test_lamp_off(void **state)
 {
-    struct LampControl *lamp_control = *state;
+    struct LampControlRedGreen *lamp_control = *state;
 
     /* setup */
     lamp_control->lamp_state = LAMP_STATE_RED;
@@ -178,13 +177,14 @@ static void test_lamp_off(void **state)
 
 static int setup(void **state)
 {
-    struct LampControl *lamp_control = malloc(sizeof(struct LampControl));
-    assert_non_null(lamp_control);
-    *state = lamp_control;
+    struct LampControlRedGreen *lamp_control;
 
     expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_OFF);
-    lamp_control_init(lamp_control);
+    lamp_control = lamp_control_init();
+    assert_non_null(lamp_control);
     assert_int_equal(lamp_control->lamp_state, LAMP_STATE_OFF);
+
+    *state = lamp_control;
 
     return 0;
 }
@@ -192,8 +192,6 @@ static int setup(void **state)
 static int teardown(void **state)
 {
     lamp_control_deinit(*state);
-    free(*state);
-
     return 0;
 }
 

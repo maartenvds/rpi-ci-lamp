@@ -7,6 +7,7 @@ LDFLAGS+=
 LIBCILAMP=libcilamp.a
 LIBJSMN=libjsmn.a
 CMNFLAGS=
+NOWIRINGPI?=0
 
 ifeq ($(DEBUG), 1)
     CMNFLAGS += -fno-omit-frame-pointer -fsanitize=address --coverage
@@ -18,7 +19,7 @@ endif
 CFLAGS += $(CMNFLAGS)
 LDFLAGS += $(CMNFLAGS)
 
-export CFLAGS LDFLAGS LIBCILAMP LIBJSMN LDLIBS CC
+export CFLAGS LDFLAGS LIBCILAMP LIBJSMN LDLIBS CC NOWIRINGPI
 
 all: $(LIBCILAMP) bin
 
