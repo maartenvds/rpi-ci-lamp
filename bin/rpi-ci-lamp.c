@@ -28,7 +28,12 @@ int main(int argc, char *argv[])
     signal(SIGINT, int_handler);
     signal(SIGTERM, int_handler);
 
-    if (application_init(&app, "settings.json", "https://api.travis-ci.org", 0) == -1) {
+    if (argc != 2) {
+        error("Usage: %s SETTINGSFILE\n", argv[0]);
+        return -1;
+    }
+
+    if (application_init(&app, argv[1], "https://api.travis-ci.org", 0) == -1) {
         application_deinit(&app);
         error("Initialization failed\n");
         return -1;
