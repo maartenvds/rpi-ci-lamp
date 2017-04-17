@@ -26,7 +26,9 @@ int application_init(struct Application *self, const char *settings_filename, co
     chunk = curl_slist_append(chunk, "Host: api.travis-ci.org");
     self->request_headers = chunk;
 
-    lamp_control_init(&self->lamp_control);
+    self->lamp_control = lamp_control_init();
+    if (!self->lamp_control)
+        return -1;
 
     if (https_request_init(&self->https, disable_cert_verify) == -1)
         return -1;
@@ -36,7 +38,16 @@ int application_init(struct Application *self, const char *settings_filename, co
 
 void application_deinit(struct Application *self)
 {
-    curl_slist_free_all(self->request_headers);
+    if (self->lamp_control) {
+        lamp_control_deinit(self->lamp_control);
+        self->lamp_control = NULL;
+    }
+
+    if (self->request_headers) {
+        curl_slist_free_all(self->request_headers);
+        self->request_headers = NULL;
+    }
+
     https_request_deinit(&self->https);
 }
 
@@ -112,9 +123,9 @@ int application_run(struct Application *self)
     enum BuildState aggregate_build_state;
 
     if (application_routine(self, &aggregate_build_state) == 0)
-        lamp_control_set_state(&self->lamp_control, aggregate_build_state);
+        lamp_control_set_state(self->lamp_control, aggregate_build_state);
     else
-        lamp_control_signal_error(&self->lamp_control);
+        lamp_control_signal_error(self->lamp_control);
 
     return self->settings.interval;
 }

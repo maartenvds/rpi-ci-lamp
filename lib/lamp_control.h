@@ -7,41 +7,35 @@
 #define LAMP_CONTROL_H
 
 #include "build_state.h"
-#include "lamp_io_red_green.h"
-
-struct LampControl
-{
-    enum LampStateRedGreen lamp_state;
-    struct LampIoRedGreen lamp_io;
-};
 
 /*
- *  self:  lamp control instance
+ *  Returns a lamp control handle on success, returns NULL on failure
  */
-int lamp_control_init(struct LampControl *self);
+void *lamp_control_init(void);
 
 /*
- *  self:  lamp control instance
+ *  Clean up the lamp control instance
+ *  self:  lamp control handle
  */
-void lamp_control_deinit(struct LampControl *self);
+void lamp_control_deinit(void *self);
 
 /*
  *  Set the state of the lamp
- *  self:  lamp control instance
+ *  self:   lamp control instance
  *  state:  aggregate build state to be displayed on the lamp
  */
-void lamp_control_set_state(struct LampControl *self, enum BuildState build_state);
+void lamp_control_set_state(void *self, enum BuildState build_state);
 
 /*
  *  Signal program error on the lamp
  *  self:  lamp control instance
  */
-void lamp_control_signal_error(struct LampControl *self);
+void lamp_control_signal_error(void *self);
 
 /*
  *  Turn of the lamp
  *  self:  lamp control instance
  */
-void lamp_control_off(struct LampControl *self);
+void lamp_control_off(void *self);
 
 #endif /* LAMP_CONTROL_H */

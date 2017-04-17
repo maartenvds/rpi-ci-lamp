@@ -13,6 +13,6 @@ $(LIBCILAMP): $(LIBOBJ)
 	ar rcs $@ $(LIBOBJ)
 
 clean:
-	rm -rf $(LIBOBJ) $(LIBCILAMP) *.gcda *.gcno
+	rm -rf $(LIBCILAMP) *.o *.gcda *.gcno
 
 .PHONY: clean
