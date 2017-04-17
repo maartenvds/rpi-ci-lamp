@@ -14,8 +14,8 @@ static struct Application app;
 void int_handler(int dummy)
 {
     (void)dummy;
+    lamp_control_off(app.lamp_control);
     application_deinit(&app);
-    lamp_control_off(&app.lamp_control);
     exit(0);
 }
 
