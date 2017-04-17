@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
     int sleep_time;
 
     signal(SIGINT, int_handler);
+    signal(SIGTERM, int_handler);
 
     if (application_init(&app, "settings.json", "https://api.travis-ci.org", 0) == -1) {
         application_deinit(&app);
