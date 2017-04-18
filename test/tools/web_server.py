@@ -1,5 +1,6 @@
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 import ssl
+import os
 
 FILE_PREFIX = "test/data/"
 
@@ -11,9 +12,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         # Send the html message
         branch = self.path.split('/')[-1]
-        print branch
-        with open(FILE_PREFIX + branch, "r") as f:
-            self.wfile.write(f.read())
+        filename = FILE_PREFIX + branch
+        if os.path.isfile(filename):
+            with open(FILE_PREFIX + branch, "r") as f:
+                self.wfile.write(f.read())
 
 try:
     server = HTTPServer(('localhost', 4443), RequestHandler)
