@@ -27,8 +27,10 @@ void *lamp_control_init(void)
     if (!self)
         return NULL;
 
-    if (lamp_io_red_green_init(&self->lamp_io) == -1)
-       return NULL;
+    if (lamp_io_red_green_init(&self->lamp_io) == -1) {
+        free(self);
+        return NULL;
+    }
 
     lamp_control_off(self);
     return self;
