@@ -8,6 +8,16 @@
 
 #include <pthread.h>
 
+/* I/O pin definitions */
+
+#ifndef LAMP_IO_RED_PIN
+#define LAMP_IO_RED_PIN     (int)23
+#endif
+
+#ifndef LAMP_IO_GREEN_PIN
+#define LAMP_IO_GREEN_PIN   (int)21
+#endif
+
 enum LampStateRedGreen
 {
     LAMP_STATE_OFF = 0,
