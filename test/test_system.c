@@ -174,7 +174,7 @@ static void test_settings_file_syntax_error(void **state)
     expect_value(lamp_io_red_green_set_state, lamp_state, LAMP_STATE_ERROR);
 
     /* act */
-    res = application_init(app, FILE_PREFIX "syntax_error_settings.txt", LOCALHOST_TEST_SERVER_URI, 1);
+    res = application_init(app, FILE_PREFIX "syntax_error_settings.json", LOCALHOST_TEST_SERVER_URI, 1);
     assert_int_equal(res, 0);
     (void) application_run(app);
 }
