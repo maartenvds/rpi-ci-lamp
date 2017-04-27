@@ -21,7 +21,7 @@ static int perform_regex(const char *string, const char *regex_string, const cha
     int ret;
     regex_t regex;
 
-    ret = regcomp(&regex, regex_string, 0);
+    ret = regcomp(&regex, regex_string, REG_EXTENDED|REG_NOSUB);
     if (ret) {
         regex_report_and_cleanup(ret, &regex, regex_name);
         return -1;
@@ -62,7 +62,7 @@ int response_parser_get_result(const char *in, const char *regex_passed,
     else if (match_failed)
         *state = BUILD_STATE_FAILED;
     else {
-        error("No regex matched response: %s\n", in);
+        error("No regex matched the following response: %s\n", in);
         return -1;
     }
 

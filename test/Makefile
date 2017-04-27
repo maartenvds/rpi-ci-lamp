@@ -5,8 +5,7 @@ CFLAGS += -I$(LIBDIR)
 CFLAGS += $(shell pkg-config --cflags cmocka)
 LDLIBS += $(shell pkg-config --libs cmocka)
 
-all: test_settings_parser \
-	test_response_parser \
+all: test_response_parser \
 	test_lamp_control_red_green \
 	test_lamp_io_red_green \
 	test_system

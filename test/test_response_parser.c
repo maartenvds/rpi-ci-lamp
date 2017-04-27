@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include "response_parser.h"
 
+#define REGEX_MATCH_NOTHING "$a"
 #define BIG_RESPONSE_STRING \
     "{\"branch\":{\"id\":214119164,\"repository_id\":119756,\"commit_id\":61565287,\"number\":\"4880\",\"config\"" \
     ":{\"language\":\"ruby\",\"sudo\":false,\"rvm\":\"2.3.3\",\"cache\":\"bundler\",\"addons\":{\"postgresql\"" \
@@ -20,7 +21,7 @@
     ":\"GitHub\",\"committer_email\":\"noreply@github.com\",\"compare_url\":\"https://github.com/travis-ci/travis-api" \
     "/compare/781f29346984d63f8e9e6b65e908e42d0c3a0fdb...925ffdeea1a1013ec02b29c1b22ebbea6a851556\"}}"
 
-static void test_response_parser_passed(void **state)
+static void test_response_parser_build_passed(void **state)
 {
     (void)state;
     int res;
@@ -32,7 +33,8 @@ static void test_response_parser_passed(void **state)
     assert_true(res > 0);
 
     /* act */
-    res = travis_ci_parse_response(in, &build_state);
+    res = response_parser_get_result(in, "\"state\":\"passed\"",
+            REGEX_MATCH_NOTHING, REGEX_MATCH_NOTHING, &build_state);
     free(in);
 
     /* assert */
@@ -40,7 +42,7 @@ static void test_response_parser_passed(void **state)
     assert_int_equal(build_state, BUILD_STATE_PASSED);
 }
 
-static void test_response_parser_failed(void **state)
+static void test_response_parser_build_failed(void **state)
 {
     (void)state;
     int res;
@@ -52,7 +54,8 @@ static void test_response_parser_failed(void **state)
     assert_true(res > 0);
 
     /* act */
-    res = travis_ci_parse_response(in, &build_state);
+    res = response_parser_get_result(in, REGEX_MATCH_NOTHING,
+            REGEX_MATCH_NOTHING, "\"state\":\"failed\"", &build_state);
     free(in);
 
     /* assert */
@@ -60,7 +63,7 @@ static void test_response_parser_failed(void **state)
     assert_int_equal(build_state, BUILD_STATE_FAILED);
 }
 
-static void test_response_parser_running1(void **state)
+static void test_response_parser_build_is_running(void **state)
 {
     (void)state;
     int res;
@@ -72,7 +75,8 @@ static void test_response_parser_running1(void **state)
     assert_true(res > 0);
 
     /* act */
-    res = travis_ci_parse_response(in, &build_state);
+    res = response_parser_get_result(in, REGEX_MATCH_NOTHING,
+            "\"state\":\"(started|created)\"", REGEX_MATCH_NOTHING, &build_state);
     free(in);
 
     /* assert */
@@ -80,40 +84,76 @@ static void test_response_parser_running1(void **state)
     assert_int_equal(build_state, BUILD_STATE_RUNNING);
 }
 
-static void test_response_parser_running2(void **state)
+static void test_response_parser_empty_response(void **state)
 {
     (void)state;
     int res;
     enum BuildState build_state;
-    char *in;
-
-    /* setup */
-    res = asprintf(&in, BIG_RESPONSE_STRING, "state", "started");
-    assert_true(res > 0);
+    char *in = "";
 
     /* act */
-    res = travis_ci_parse_response(in, &build_state);
-    free(in);
+    res = response_parser_get_result(in, "\"state\":\"passed\"",
+            REGEX_MATCH_NOTHING, REGEX_MATCH_NOTHING, &build_state);
 
     /* assert */
-    assert_int_equal(res, 0);
-    assert_int_equal(build_state, BUILD_STATE_RUNNING);
+    assert_int_equal(res, -1);
 }
 
-static void test_response_parser_state_token_not_found(void **state)
+static void test_response_parser_no_match(void **state)
 {
     (void)state;
     int res;
     enum BuildState build_state;
-    char *in;
-
-    /* setup */
-    res = asprintf(&in, BIG_RESPONSE_STRING, "unknown", "failed");
-    assert_true(res > 0);
+    char *in = "no match in here";
 
     /* act */
-    res = travis_ci_parse_response(in, &build_state);
-    free(in);
+    res = response_parser_get_result(in, REGEX_MATCH_NOTHING,
+            REGEX_MATCH_NOTHING, REGEX_MATCH_NOTHING, &build_state);
+
+    /* assert */
+    assert_int_equal(res, -1);
+}
+
+static void test_response_parser_syntax_error_in_regex_passed(void **state)
+{
+    (void)state;
+    int res;
+    enum BuildState build_state;
+    char *in = "some text";
+
+    /* act */
+    res = response_parser_get_result(in, "there|is|an|error|in)(here",
+            REGEX_MATCH_NOTHING, REGEX_MATCH_NOTHING, &build_state);
+
+    /* assert */
+    assert_int_equal(res, -1);
+}
+
+static void test_response_parser_syntax_error_in_regex_running(void **state)
+{
+    (void)state;
+    int res;
+    enum BuildState build_state;
+    char *in = "some text";
+
+    /* act */
+    res = response_parser_get_result(in, REGEX_MATCH_NOTHING,
+            "there|is|an|error|in)(here", REGEX_MATCH_NOTHING, &build_state);
+
+    /* assert */
+    assert_int_equal(res, -1);
+}
+
+static void test_response_parser_syntax_error_in_regex_failed(void **state)
+{
+    (void)state;
+    int res;
+    enum BuildState build_state;
+    char *in = "some text";
+
+    /* act */
+    res = response_parser_get_result(in, REGEX_MATCH_NOTHING,
+            REGEX_MATCH_NOTHING, "there|is|an|error|in)(here", &build_state);
 
     /* assert */
     assert_int_equal(res, -1);
@@ -122,11 +162,14 @@ static void test_response_parser_state_token_not_found(void **state)
 int main(void)
 {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test(test_response_parser_passed),
-        cmocka_unit_test(test_response_parser_failed),
-        cmocka_unit_test(test_response_parser_running1),
-        cmocka_unit_test(test_response_parser_running2),
-        cmocka_unit_test(test_response_parser_state_token_not_found),
+        cmocka_unit_test(test_response_parser_build_passed),
+        cmocka_unit_test(test_response_parser_build_failed),
+        cmocka_unit_test(test_response_parser_build_is_running),
+        cmocka_unit_test(test_response_parser_empty_response),
+        cmocka_unit_test(test_response_parser_no_match),
+        cmocka_unit_test(test_response_parser_syntax_error_in_regex_passed),
+        cmocka_unit_test(test_response_parser_syntax_error_in_regex_running),
+        cmocka_unit_test(test_response_parser_syntax_error_in_regex_failed),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

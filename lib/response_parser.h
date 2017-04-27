@@ -1,5 +1,5 @@
 /*
- *  Request parser
+ *  Response parser
  *  Author: Maarten Vandersteegen
  */
 
