@@ -32,7 +32,7 @@ static void test_response_parser_passed(void **state)
     assert_true(res > 0);
 
     /* act */
-    res = response_parser_build_result(in, &build_state);
+    res = travis_ci_parse_response(in, &build_state);
     free(in);
 
     /* assert */
@@ -52,7 +52,7 @@ static void test_response_parser_failed(void **state)
     assert_true(res > 0);
 
     /* act */
-    res = response_parser_build_result(in, &build_state);
+    res = travis_ci_parse_response(in, &build_state);
     free(in);
 
     /* assert */
@@ -72,7 +72,7 @@ static void test_response_parser_running1(void **state)
     assert_true(res > 0);
 
     /* act */
-    res = response_parser_build_result(in, &build_state);
+    res = travis_ci_parse_response(in, &build_state);
     free(in);
 
     /* assert */
@@ -92,7 +92,7 @@ static void test_response_parser_running2(void **state)
     assert_true(res > 0);
 
     /* act */
-    res = response_parser_build_result(in, &build_state);
+    res = travis_ci_parse_response(in, &build_state);
     free(in);
 
     /* assert */
@@ -112,7 +112,7 @@ static void test_response_parser_state_token_not_found(void **state)
     assert_true(res > 0);
 
     /* act */
-    res = response_parser_build_result(in, &build_state);
+    res = travis_ci_parse_response(in, &build_state);
     free(in);
 
     /* assert */

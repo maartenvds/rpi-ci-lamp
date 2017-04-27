@@ -1,5 +1,5 @@
 CC=gcc
-LDLIBS+= -lcurl -pthread
+LDLIBS+= -lcurl -pthread -lconfig
 CFLAGS+=
 CFLAGS+= -D_GNU_SOURCE
 CFLAGS+= -Wall -W -Wextra -Werror

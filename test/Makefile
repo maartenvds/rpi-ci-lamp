@@ -1,5 +1,7 @@
 LIBDIR = ../lib
 JSMNDIR = ../third_party/jsmn
+CFLAGS += -DTRAVIC_CI_SERVER_URI_OPEN_SOURCE=localhost:4443
+CFLAGS += -DTRAVIC_CI_SERVER_URI_PRO=localhost:4443
 CFLAGS += -I$(LIBDIR) -I$(JSMNDIR)
 CFLAGS += $(shell pkg-config --cflags cmocka)
 LDLIBS += $(shell pkg-config --libs cmocka)
