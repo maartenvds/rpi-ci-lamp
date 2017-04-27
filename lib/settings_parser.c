@@ -31,7 +31,7 @@ static int settings_parse_server_config(struct BuildInfo *build_info, config_t *
         return -1;
     }
 
-    headers = config_setting_lookup(server, "headers");
+    headers = config_setting_get_member(server, "headers");
     if (!headers) {
         error("Settings file: failed reading 'headers' setting from '%s'\n", name);
         return -1;
