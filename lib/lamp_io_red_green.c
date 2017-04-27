@@ -8,14 +8,6 @@
 #include <stdio.h>
 #include <wiringPi.h>
 
-#ifndef LAMP_IO_RED_PIN
-#define LAMP_IO_RED_PIN     (int)23
-#endif
-
-#ifndef LAMP_IO_GREEN_PIN
-#define LAMP_IO_GREEN_PIN   (int)21
-#endif
-
 /*
  *  Thread for supporting a blinking lamp
  */
@@ -72,7 +64,6 @@ void lamp_io_red_green_set_state(struct LampIoRedGreen *self, enum LampStateRedG
             digitalWrite(LAMP_IO_GREEN_PIN, LOW);
             debug("lamp = off\n");
             break;
-
         case LAMP_STATE_GREEN :
             digitalWrite(LAMP_IO_RED_PIN, LOW);
             digitalWrite(LAMP_IO_GREEN_PIN, HIGH);

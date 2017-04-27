@@ -15,7 +15,7 @@ done
 ./test/test_response_parser &&
     ./test/test_settings_parser &&
     ./test/test_lamp_control_red_green &&
-    ./test/test_application &&
+    ./test/test_lamp_io_red_green &&
     ./test/test_system
 
 # stop test server

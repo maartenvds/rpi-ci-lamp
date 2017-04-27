@@ -9,7 +9,7 @@
 ### END INIT INFO
 
 BASEDIR=/home/pi/code/rpi-ci-lamp
-SCRIPT="$BASEDIR/bin/rpi-ci-lamp $BASEDIR/settings.json"
+SCRIPT="$BASEDIR/bin/rpi-ci-lamp $BASEDIR/config_examples/rpi_ci_lamp.conf"
 RUNAS=root
 
 PIDFILE=/var/run/rpi-ci-lamp.pid

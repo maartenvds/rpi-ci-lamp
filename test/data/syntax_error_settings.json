@@ -1,9 +1,0 @@
-{
-    "interval":5,
-    "repos":
-    [
-        {
-            "name":"maartenvds/rpi-ci-lamp",
-            "branch":"master"
-        }
-}

@@ -21,8 +21,6 @@ void int_handler(int dummy)
 
 int main(int argc, char *argv[])
 {
-    (void)argc;
-    (void)argv;
     int sleep_time;
 
     signal(SIGINT, int_handler);
@@ -33,7 +31,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    if (application_init(&app, argv[1], "https://api.travis-ci.org", 0) == -1) {
+    if (application_init(&app, argv[1], 0) == -1) {
         application_deinit(&app);
         error("Initialization failed\n");
         return -1;

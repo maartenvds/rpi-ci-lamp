@@ -1,9 +1,9 @@
 /*
- *  HTTPS request handler
+ *  HTTPS client handler
  *  Author: Maarten Vandersteege
  */
 
-#include "https_request.h"
+#include "https_client.h"
 #include "logging.h"
 #include <string.h>
 
@@ -12,7 +12,7 @@
         __typeof__ (b) _b = (b); \
         _a < _b ? _a : _b; })
 
-static size_t write_function(void *in, size_t size, size_t nmemb, struct HttpsRequest *self)
+static size_t write_function(void *in, size_t size, size_t nmemb, struct HttpsClient *self)
 {
     size_t len = MIN(size * nmemb, self->response_size - self->bytes_read - 1);
 
@@ -25,7 +25,7 @@ static size_t write_function(void *in, size_t size, size_t nmemb, struct HttpsRe
     return len;
 }
 
-int https_request_init(struct HttpsRequest *self, int disable_cert_verify)
+int https_client_init(struct HttpsClient *self, int disable_cert_verify)
 {
     CURLcode res;
     long verify = disable_cert_verify ? 0L : 1L;
@@ -63,7 +63,7 @@ int https_request_init(struct HttpsRequest *self, int disable_cert_verify)
     return 0;
 }
 
-int https_request_get(struct HttpsRequest *self, const char *uri, struct curl_slist *request_headers,
+int https_client_get(struct HttpsClient *self, const char *uri, const struct curl_slist *request_headers,
                                                                 char *response, size_t response_size)
 {
     CURLcode res;
@@ -109,7 +109,7 @@ int https_request_get(struct HttpsRequest *self, const char *uri, struct curl_sl
     return 0;
 }
 
-void https_request_deinit(struct HttpsRequest *self)
+void https_client_deinit(struct HttpsClient *self)
 {
     if (self->curl) {
         curl_easy_cleanup(self->curl);
