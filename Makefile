@@ -5,7 +5,6 @@ CFLAGS+= -D_GNU_SOURCE
 CFLAGS+= -Wall -W -Wextra -Werror
 LDFLAGS+=
 LIBCILAMP=libcilamp.a
-LIBJSMN=libjsmn.a
 CMNFLAGS=
 NOWIRINGPI?=0
 
@@ -19,20 +18,17 @@ endif
 CFLAGS += $(CMNFLAGS)
 LDFLAGS += $(CMNFLAGS)
 
-export CFLAGS LDFLAGS LIBCILAMP LIBJSMN LDLIBS CC NOWIRINGPI
+export CFLAGS LDFLAGS LIBCILAMP LDLIBS CC NOWIRINGPI
 
 all: $(LIBCILAMP) bin
 
 $(LIBCILAMP):
 	make -C lib/
 
-$(LIBJSMN):
-	make -C third_party/jsmn/
-
-test: $(LIBCILAMP) $(LIBJSMN)
+test: $(LIBCILAMP)
 	make -C test/
 
-bin: $(LIBCILAMP) $(LIBJSMN)
+bin: $(LIBCILAMP)
 	make -C bin/
 
 coverage:
@@ -40,7 +36,6 @@ coverage:
 	genhtml coverage.info --rc genhtml_branch_coverage=1 --output-directory output
 
 clean:
-	make -C third_party/jsmn/ clean
 	make -C lib/ clean
 	make -C test/ clean
 	make -C bin/ clean
