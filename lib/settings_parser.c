@@ -15,32 +15,32 @@ static int settings_parse_server_config(struct BuildInfo *build_info, config_t *
 
     server = config_lookup(cf, name);
     if (!server) {
-        error("Server settings for %s not found\n", name);
+        error("Settings file: failed reading server setting %s\n", name);
         return -1;
     }
     if (!config_setting_lookup_string(server, "regex_passed", &build_info->regex_passed)) {
-        error("Server setting 'regex_passed' not found in '%s'\n", name);
+        error("Settings file: failed reading 'regex_passed' setting from '%s'\n", name);
         return -1;
     }
     if (!config_setting_lookup_string(server, "regex_running", &build_info->regex_running)) {
-        error("Server setting 'regex_running' not found in '%s'\n", name);
+        error("Settings file: failed reading 'regex_running' setting from '%s'\n", name);
         return -1;
     }
     if (!config_setting_lookup_string(server, "regex_failed", &build_info->regex_failed)) {
-        error("Server setting 'regex_failed' not found in '%s'\n", name);
+        error("Settings file: failed reading 'regex_failed' setting from '%s'\n", name);
         return -1;
     }
 
     headers = config_setting_lookup(server, "headers");
     if (!headers) {
-        error("Server setting 'headers' not found in '%s'\n", name);
+        error("Settings file: failed reading 'headers' setting from '%s'\n", name);
         return -1;
     }
     count = config_setting_length(headers);
     for (n = 0; n < count; n++) {
         header = config_setting_get_string_elem(headers, n);
         if (!header) {
-            error("Server setting 'headers' must be a list\n");
+            error("Settings file: server setting 'headers' must contain only strings\n");
             if (chunk)
                 curl_slist_free_all(chunk);
             return -1;
@@ -48,8 +48,8 @@ static int settings_parse_server_config(struct BuildInfo *build_info, config_t *
         chunk = curl_slist_append(chunk, header);
     }
     build_info->headers = chunk;
-    if (!chunk) {
-        error("Settings: failed to create header list\n");
+    if (!chunk && count > 0) {
+        error("Settings file: failed to create header list\n");
         return -1;
     }
 
@@ -72,19 +72,20 @@ int settings_parser_parse_config(const char *filename, struct Settings *settings
         return -1;
     }
     if (!config_lookup_int(cf, "interval", &settings->interval)) {
-        error("Settings file no 'interval' setting found\n");
+        error("Settings file: failed reading 'interval' setting\n");
         config_destroy(cf);
         return -1;
     }
     builds = config_lookup(cf, "build-info");
     if (!builds) {
-        error("Settings file no 'build-info' found\n");
+        error("Settings file: failed reading 'build-info' setting\n");
         config_destroy(cf);
         return -1;
     }
     count = config_setting_length(builds);
     if (count > SETTINGS_PARSER_BUILDS_SIZE) {
-        error("Settings file: max number of build (%d) exceeded\n", SETTINGS_PARSER_BUILDS_SIZE);
+        error("Settings file: max number of 'build-info' entries (%d) exceeded\n",
+                SETTINGS_PARSER_BUILDS_SIZE);
         config_destroy(cf);
         return -1;
     }
@@ -92,17 +93,18 @@ int settings_parser_parse_config(const char *filename, struct Settings *settings
     for (n = 0; n < count; n++) {
         build = config_setting_get_elem(builds, n);
         if (!build) {
-            error("Settings file: Builds must be a list\n");
+            /* sanity check, but can normally not occure */
+            error("Settings file: unknown error\n");
             config_destroy(cf);
             return -1;
         }
         if (!config_setting_lookup_string(build, "url", &settings->builds[n].url)) {
-            error("Settings file: 'url' missing in entry %d\n", n);
+            error("Settings file: failed reading 'url' setting in entry %d\n", n);
             config_destroy(cf);
             return -1;
         }
         if (!config_setting_lookup_string(build, "server", &servername)) {
-            error("Settings file: 'server' missing in entry %d\n", n);
+            error("Settings file: failed reading 'server' setting in entry %d\n", n);
             config_destroy(cf);
             return -1;
         }

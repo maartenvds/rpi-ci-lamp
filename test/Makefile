@@ -1,6 +1,4 @@
 LIBDIR = ../lib
-CFLAGS += -DTRAVIC_CI_SERVER_URI_OPEN_SOURCE=localhost:4443
-CFLAGS += -DTRAVIC_CI_SERVER_URI_PRO=localhost:4443
 CFLAGS += -I$(LIBDIR)
 CFLAGS += $(shell pkg-config --cflags cmocka)
 LDLIBS += $(shell pkg-config --libs cmocka)
@@ -8,6 +6,7 @@ LDLIBS += $(shell pkg-config --libs cmocka)
 all: test_response_parser \
 	test_lamp_control_red_green \
 	test_lamp_io_red_green \
+	test_settings_parser \
 	test_system
 
 test_response_parser: test_response_parser.o $(LIBDIR)/$(LIBCILAMP)
