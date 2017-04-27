@@ -6,17 +6,15 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
-#include "build_state.h"
+#include "https_client.h"
 #include "lamp_control.h"
-#include "https_request.h"
 #include "settings_parser.h"
 
 struct Application
 {
-    struct HttpsRequest https;
+    struct HttpsClient client;
     struct Settings settings;
     const char *settings_filename;
-    const char *uri;
     struct curl_slist *request_headers;
     void *lamp_control;
 };
@@ -28,7 +26,7 @@ struct Application
  *  disable_cert_verify:    disable server vertificate verification
  *  return: zero on success, non zero on failure
  */
-int application_init(struct Application *self, const char *settings_filename, const char *uri, int disable_cert_verify);
+int application_init(struct Application *self, const char *settings_filename, int disable_cert_verify);
 
 /*
  *  self:   application instance

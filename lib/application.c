@@ -4,33 +4,23 @@
  */
 #include "application.h"
 #include "response_parser.h"
-#include "read_file.h"
 #include "logging.h"
 #include <string.h>
 #include <stdlib.h>
 
-#define MAX_REPONSE_SIZE    4000
+#define MAX_RESPONSE_SIZE    4000
 
-int application_init(struct Application *self, const char *settings_filename, const char *uri, int disable_cert_verify)
+int application_init(struct Application *self, const char *settings_filename, int disable_cert_verify)
 {
-    struct curl_slist *chunk = NULL;
-
     self->settings_filename = settings_filename;
     self->settings.interval = 1;
-    self->settings.repo_count = 0;
-    self->uri = uri;
-
-    /* travis specific HTTP request headers */
-    chunk = curl_slist_append(chunk, "User-Agent: MyClient/1.0.0");
-    chunk = curl_slist_append(chunk, "Accept: application/vnd.travis-ci.2+json");
-    chunk = curl_slist_append(chunk, "Host: api.travis-ci.org");
-    self->request_headers = chunk;
+    self->settings.builds_count = 0;
 
     self->lamp_control = lamp_control_init();
     if (!self->lamp_control)
         return -1;
 
-    if (https_request_init(&self->https, disable_cert_verify) == -1)
+    if (https_client_init(&self->client, disable_cert_verify) == -1)
         return -1;
 
     return 0;
@@ -43,12 +33,7 @@ void application_deinit(struct Application *self)
         self->lamp_control = NULL;
     }
 
-    if (self->request_headers) {
-        curl_slist_free_all(self->request_headers);
-        self->request_headers = NULL;
-    }
-
-    https_request_deinit(&self->https);
+    https_client_deinit(&self->client);
 }
 
 static void accumulate_build_state(enum BuildState *aggregate_build_state, enum BuildState build_state)
@@ -64,57 +49,40 @@ static void accumulate_build_state(enum BuildState *aggregate_build_state, enum 
 
 static int application_routine(struct Application *self, enum BuildState *aggregate_build_state)
 {
-    int i, res;
+    int i;
     enum BuildState build_state;
-    char *complete_uri, *settings_str;
-    char response[MAX_REPONSE_SIZE];
+    char response[MAX_RESPONSE_SIZE];
 
-    /* read settings */
-    settings_str = read_file(self->settings_filename);
-    if (!settings_str) {
-        error("Failed to read settings file %s\n", self->settings_filename);
-        return -1;
-    }
-
-    /* parse settings */
-    res = settings_parser_get_settings(settings_str, &self->settings);
-    free(settings_str);
-    if (res == -1) {
+    /* parse settings file */
+    if (settings_parser_parse_config(self->settings_filename, &self->settings) == -1) {
         error("Failed to parse settings file %s\n", self->settings_filename);
         return -1;
     }
 
     *aggregate_build_state = BUILD_STATE_PASSED; /* initial state */
 
-    /* loop over all repository entries */
-    for (i=0; i<self->settings.repo_count; i++) {
-        char *name = self->settings.repos[i].name;
-        char *branch = self->settings.repos[i].branch;
+    /* loop over all build info entries */
+    for (i=0; i<self->settings.builds_count; i++) {
+        const struct BuildInfo *build_info = &self->settings.builds[i];
 
-        /* construct HTTP request */
-        res = asprintf(&complete_uri, "%s/repos/%s/branches/%s", self->uri, name, branch);
-        if (res <= 0) {
-            error("Failed constructing HTTP URI\n");
+        if (https_client_get(&self->client, build_info->url, build_info->headers,
+                response, MAX_RESPONSE_SIZE) == -1) {
+            error("Request for '%s' failed\n", build_info->url);
+            settings_parser_destroy(&self->settings);
             return -1;
         }
 
-        /* perform HTTP request */
-        res = https_request_get(&self->https, complete_uri, self->request_headers, response, MAX_REPONSE_SIZE);
-        free(complete_uri);
-        if (res == -1) {
-            error("Request for '%s','%s' failed\n", name, branch);
-            return -1;
-        }
-
-        /* parse HTTP response */
-        if (response_parser_build_result(response, &build_state) == -1) {
-            error("Failed parsing response from '%s','%s'\n", name, branch);
+        if (response_parser_get_result(response, build_info->regex_passed,
+                build_info->regex_running, build_info->regex_failed, &build_state) == -1) {
+            error("Failed parsing response from '%s'\n", build_info->url);
+            settings_parser_destroy(&self->settings);
             return -1;
         }
 
         accumulate_build_state(aggregate_build_state, build_state);
     }
 
+    settings_parser_destroy(&self->settings);
     return 0;
 }
 

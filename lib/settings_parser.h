@@ -6,27 +6,38 @@
 #ifndef SETTINGS_PARSER_H
 #define SETTINGS_PARSER_H
 
-#define SETTINGS_PARSER_STRING_SIZE     100
-#define SETTINGS_PARSER_REPO_SIZE       5
+#include <curl/curl.h>
+#include <libconfig.h>
 
-struct SettingsRepo
+#define SETTINGS_PARSER_BUILDS_SIZE     5
+
+struct BuildInfo
 {
-    char name[SETTINGS_PARSER_STRING_SIZE];
-    char branch[SETTINGS_PARSER_STRING_SIZE];
+    const char *url;
+    struct curl_slist *headers;
+    const char *regex_passed;
+    const char *regex_running;
+    const char *regex_failed;
 };
 
 struct Settings
 {
-    int interval;                                               /* poll interval in seconds */
-    int repo_count;
-    struct SettingsRepo repos[SETTINGS_PARSER_REPO_SIZE];       /* repos to track */
+    config_t cf;    /* reference to complete parsed config, only used internally */
+    int interval;
+    int builds_count;
+    struct BuildInfo builds[SETTINGS_PARSER_BUILDS_SIZE];
 };
 
 /*
- *  in:     settings text string
- *  out:    parsed settings
- *  return: zero on success, non zero on failure
+ *  filename:   configuration file name
+ *  settings:   parsed settings struct
+ *  return: zero on success, -1 on failure
  */
-int settings_parser_get_settings(const char *in, struct Settings *out);
+int settings_parser_parse_config(const char *filename, struct Settings *settings);
+
+/*
+ *  Destroy created settings struct
+ */
+void settings_parser_destroy(struct Settings *settings);
 
 #endif /* SETTINGS_PARSER_H */
