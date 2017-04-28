@@ -6,12 +6,14 @@
 | Code coverage   | [![codecov](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/master/graph/badge.svg)](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/master) | [![codecov](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/development/graph/badge.svg)](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/development) | [![codecov](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/coverity_scan/graph/badge.svg)](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/coverity_scan)
 | Static analysis | N/A           | N/A           | [![Coverity scan](https://scan.coverity.com/projects/12311/badge.svg)](https://scan.coverity.com/projects/maartenvds-rpi-ci-lamp) |
 
-Note: coverity scan analysis is only ran on the coverity_scan branch to limit the maximum number of allowed builds.
-
 ## What is it?
 Raspberry pi based CI-lamp to monitor CI-builds. Any HTTPS/REST based CI-API will do.
+Examples available for:
+* Travis-CI
+* Gitlab pipelines
+
 Currently supported lamps:
-* red/green
+* red/green signal tower
 
 ## Compiling
 
@@ -51,7 +53,7 @@ To quickly test the lamp, you can use the config file that monitors this project
 
 ## Configuration
 
-You will ofcourse want to create your own configuration file. A basic config file would look like:
+You will of course want to create your own configuration file. A basic config file would look like:
   
     interval = 5;   # delay in seconds between two consecutive query sessions
     build-info = (
