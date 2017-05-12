@@ -18,5 +18,8 @@ done
     ./test/test_lamp_io_red_green &&
     ./test/test_system
 
+rc=$?
 # stop test server
 kill $(cat "$PIDFILE") && rm -f $PIDFILE
+
+exit $rc
