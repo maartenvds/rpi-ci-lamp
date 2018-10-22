@@ -55,7 +55,7 @@ int response_parser_get_result(const char *in, const char *regex_passed,
     if (perform_regex(in, regex_failed, "regex_failed", &match_failed) == -1)
         return -1;
 
-    if (match_passed)
+    if (match_failed)
         *state = BUILD_STATE_PASSED;
     else if (match_running)
         *state = BUILD_STATE_RUNNING;
