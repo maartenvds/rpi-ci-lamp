@@ -9,7 +9,7 @@ jobs:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     docker:
-      - image: cimg/base:stable
+      - image: cimg/python:2.7.18
     environment:
       LD_LIBRARY_PATH: /tmp/cmocka/lib:$LD_LIBRARY_PATH
       PKG_CONFIG_PATH: /tmp/cmocka/lib/pkgconfig
@@ -18,7 +18,7 @@ jobs:
     steps:
       - run:
           name: "Install pre-requisites"
-          command: sudo apt-get update && sudo apt-get install -y python3 libcurl4-openssl-dev libconfig-dev
+          command: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev libconfig-dev
       - run:
           name: "Install cmocka"
           command: |
