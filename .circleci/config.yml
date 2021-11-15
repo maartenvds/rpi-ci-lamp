@@ -28,7 +28,7 @@ jobs:
             make install
             export LD_LIBRARY_PATH="/tmp/cmocka/lib:$LD_LIBRARY_PATH"
             export PKG_CONFIG_PATH="/tmp/cmocka/lib/pkgconfig"
-            cd ..
+            cd ../..
             rm cmocka-1.1.0.tar.xz
             rm -r cmocka-1.1.0
 
