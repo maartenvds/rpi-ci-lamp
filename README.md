@@ -1,10 +1,12 @@
 # rpi-ci-lamp
 
-| Metrics         | master        | development   | coverity_scan |
-| --------------- |:-------------:|:-------------:|:-------------:|
-| Build & test    | [![Travis build](https://travis-ci.org/maartenvds/rpi-ci-lamp.svg?branch=master)](https://travis-ci.org/maartenvds/rpi-ci-lamp) | [![Build Status](https://travis-ci.org/maartenvds/rpi-ci-lamp.svg?branch=development)](https://travis-ci.org/maartenvds/rpi-ci-lamp) | [![Build Status](https://travis-ci.org/maartenvds/rpi-ci-lamp.svg?branch=coverity_scan)](https://travis-ci.org/maartenvds/rpi-ci-lamp) |
-| Code coverage   | [![codecov](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/master/graph/badge.svg)](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/master) | [![codecov](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/development/graph/badge.svg)](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/development) | [![codecov](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/coverity_scan/graph/badge.svg)](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/coverity_scan)
-| Static analysis | N/A           | N/A           | [![Coverity scan](https://scan.coverity.com/projects/12311/badge.svg)](https://scan.coverity.com/projects/maartenvds-rpi-ci-lamp) |
+| Metrics         | master        | development   |
+| --------------- |:-------------:|:-------------:|
+| Build & test    | [![Build status](https://circleci.com/gh/maartenvds/rpi-ci-lamp/tree/master.svg?style=svg)](https://circleci.com/gh/maartenvds/rpi-ci-lamp/tree/master) | [![Build Status](https://circleci.com/gh/maartenvds/rpi-ci-lamp/tree/development.svg?style=svg)](https://circleci.com/gh/maartenvds/rpi-ci-lamp/tree/development) |
+| Code coverage   | [![codecov](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/master/graph/badge.svg)](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/master) | [![codecov](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/development/graph/badge.svg)](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/development) |
+
+
+Static analysis [![Coverity scan](https://scan.coverity.com/projects/12311/badge.svg)](https://scan.coverity.com/projects/maartenvds-rpi-ci-lamp)
 
 ## What is it?
 Raspberry pi based CI-lamp to monitor CI-builds. Any HTTPS/REST based CI-API will do.
