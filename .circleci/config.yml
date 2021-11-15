@@ -10,6 +10,9 @@ jobs:
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     docker:
       - image: cimg/base:stable
+    environment:
+      LD_LIBRARY_PATH: /tmp/cmocka/lib:$LD_LIBRARY_PATH
+      PKG_CONFIG_PATH: /tmp/cmocka/lib/pkgconfig
     # Add steps to the job
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
@@ -26,11 +29,11 @@ jobs:
             cd build
             cmake -DCMAKE_INSTALL_PREFIX=/tmp/cmocka ..
             make install
-            export LD_LIBRARY_PATH="/tmp/cmocka/lib:$LD_LIBRARY_PATH"
-            export PKG_CONFIG_PATH="/tmp/cmocka/lib/pkgconfig"
             cd ../..
             rm cmocka-1.1.0.tar.xz
             rm -r cmocka-1.1.0
+            echo $LD_LIBRARY_PATH
+            echo $PKG_CONFIG_PATH
 
       - checkout
       - run:
