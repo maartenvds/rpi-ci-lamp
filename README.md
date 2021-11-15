@@ -3,7 +3,7 @@
 | Metrics         | master        | development   |
 | --------------- |:-------------:|:-------------:|
 | Build & test    | [![Build status](https://circleci.com/gh/maartenvds/rpi-ci-lamp/tree/master.svg?style=svg)](https://circleci.com/gh/maartenvds/rpi-ci-lamp/tree/master) | [![Build Status](https://circleci.com/gh/maartenvds/rpi-ci-lamp/tree/development.svg?style=svg)](https://circleci.com/gh/maartenvds/rpi-ci-lamp/tree/development) |
-| Code coverage   | [![codecov](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/master/graph/badge.svg)](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/master) | [![codecov](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/development/graph/badge.svg)](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/development) |
+| Code coverage   | [![codecov](https://app.codecov.io/gh/maartenvds/rpi-ci-lamp/branch/master/graph/badge.svg)](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/master) | [![codecov](https://codecov.io/gh/maartenvds/rpi-ci-lamp/branch/development/graph/badge.svg)](https://app.codecov.io/gh/maartenvds/rpi-ci-lamp/branch/development) |
 
 
 Static analysis [![Coverity scan](https://scan.coverity.com/projects/12311/badge.svg)](https://scan.coverity.com/projects/maartenvds-rpi-ci-lamp)
