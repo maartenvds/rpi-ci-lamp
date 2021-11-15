@@ -18,7 +18,7 @@ jobs:
     steps:
       - run:
           name: "Install pre-requisites"
-          command: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev libconfig-dev
+          command: sudo apt-get update && sudo apt-get install -y cmake libcurl4-openssl-dev libconfig-dev
       - run:
           name: "Install cmocka"
           command: |
